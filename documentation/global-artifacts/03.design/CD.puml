@@ -1,0 +1,35 @@
+@startuml
+'skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype polyline
+'skinparam linetype orto
+
+skinparam classAttributeIconSize 0
+
+'left to right direction
+
+class Item {
+    - id
+    - name
+    - price
+    - active
+    - idCategoria
+}
+
+class Category {
+    - id
+    - designation
+}
+
+class Sale {
+    - id
+    - date
+    - salePrice
+}
+
+Item --> "1" Category : has
+
+Sale --> "1" Item : includes
+
+@enduml
