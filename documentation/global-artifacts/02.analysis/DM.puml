@@ -1,0 +1,61 @@
+@startuml
+skinparam monochrome true
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+left to right direction
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+title Domain Model
+
+class Item {
+    id
+    name
+    price
+    status
+    idCategoria
+}
+
+class Category {
+    id
+    description
+}
+
+enum Status {
+    available
+    sold
+}
+
+class Sale {
+    id
+    date
+    salePrice
+    itemId
+}
+
+class AuctionBid {
+    id
+    date
+    clientId
+    saleId
+    finalPrice
+}
+
+class Client {
+    id
+    name
+    nif
+    email
+    phone
+}
+
+Item "*" --- "1" Category: cataloged as >
+Item "1" --- "1" Sale: is in >
+Status "1" --- "1..*" Item : has <
+Client "1" -- "0..*" AuctionBid : has >
+AuctionBid "1" --- "1" Sale: includes >
+
+
+@enduml
