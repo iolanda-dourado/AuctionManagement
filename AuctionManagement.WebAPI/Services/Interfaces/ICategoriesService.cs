@@ -13,5 +13,9 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
         public CategoryDTO UpdateCategory(int id, Category category);
 
         public CategoryDTO DeleteCategory(int id);
+
+        public List<CategoryDTO> GetCategoriesWithItems();
+
+        public List<CategoryDTO> GetCategoriesWithoutItems();
     }
 }
