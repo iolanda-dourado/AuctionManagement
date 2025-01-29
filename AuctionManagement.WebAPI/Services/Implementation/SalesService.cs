@@ -1,32 +1,36 @@
 ﻿using AuctionManagement.WebAPI.Data;
 using AuctionManagement.WebAPI.Dtos;
 using AuctionManagement.WebAPI.Enums;
-using AuctionManagement.WebAPI.Exceptions;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
+using AuctionManagement.WebAPI.Validators;
 
 namespace AuctionManagement.WebAPI.Services.Implementation {
     public class SalesService : ISalesService {
 
         private readonly AuctionContext context;
+        private readonly SalesValidator salesValidator;
+        private readonly ItemsValidator itemsValidator;
 
-        public SalesService(AuctionContext context) {
+        public SalesService(AuctionContext context, ItemsValidator itemsValidator, SalesValidator salesValidator) {
             this.context = context;
+            this.itemsValidator = itemsValidator;
+            this.salesValidator = salesValidator;
         }
 
 
         public SaleDTO AddSale(SaleDTOCreate saleDTO) {
-            var item = context.Items.Find(saleDTO.ItemId);
-
-            ValidateItemExistence(saleDTO.ItemId);
-            ValidateSaleDate(saleDTO.Date);
-            ValidateItemStatus(item);
+            var item = itemsValidator.ValidateItemExistence(saleDTO.ItemId);
+            salesValidator.ValidateSaleDate(saleDTO.Date);
+            itemsValidator.ValidateItemStatus(item);
 
             Sale sale = new Sale {
                 Date = saleDTO.Date,
                 Price = saleDTO.Price,
                 ItemId = saleDTO.ItemId,
             };
+
+            context.Items.Find(saleDTO.ItemId)!.Status = Status.Sold;
 
             context.Sales.Add(sale);
             context.SaveChanges();
@@ -36,22 +40,22 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
 
         public List<SaleDTO> GetSales() {
-            List<SaleDTO> salesDTO = ValidateSalesList();
+            List<SaleDTO> salesDTO = salesValidator.ValidateSalesList();
 
             return salesDTO;
         }
 
 
         public SaleDTO GetSaleById(int id) {
-            Sale sale = ValidateSale(id);
+            Sale sale = salesValidator.ValidateSale(id);
 
             return SaleDTO.FromSaleToDTO(sale);
         }
 
 
         public SaleDTO UpdateSale(int id, Sale sale) {
-            var existingSale = ValidateSale(id);
-            ValidateSaleDate(sale.Date);
+            Sale existingSale = salesValidator.ValidateSale(id);
+            salesValidator.ValidateSaleDate(sale.Date);
 
             context.Entry(existingSale).CurrentValues.SetValues(sale);
             context.SaveChanges();
@@ -61,7 +65,7 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
 
         public SaleDTO DeleteSale(int id) {
-            Sale sale = ValidateSale(id);
+            Sale sale = salesValidator.ValidateSale(id);
 
             context.Remove(sale);
             context.SaveChanges();
@@ -70,54 +74,45 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
-        private void ValidateItemExistence(int itemId) {
-            var item = context.Items.Find(itemId);
-            if (item == null) {
-                throw new InvalidOperationException("The provided item id doesn't match any existing item.");
-            }
-        }
 
-        private void ValidateSaleDate(DateOnly saleDate) {
-            var currentDate = DateOnly.FromDateTime(DateTime.Now);
-            var maxDate = new DateOnly(2024, 1, 28);
-            if (saleDate < maxDate || saleDate > currentDate) {
-                throw new InvalidOperationException("The sale date must be between 28/01/2024 and today.");
-            }
+
+        /*
+         * ----------------- EXTRA ENDPOINTS -----------------
+         */
+        public decimal GetTotalSalesValue() {
+            salesValidator.ValidateSalesList();
+            decimal totalValue = context.Sales.Sum(s => s.Price);
+
+            return totalValue;
         }
 
 
-        private void ValidateItemStatus(Item item) {
-            if (item.Status == Status.Sold) {
-                throw new InvalidOperationException("The item was already sold.");
-            }
-        }
-
-        private List<SaleDTO> ValidateSalesList() {
-            var sales = context.Sales.ToList();
-            var salesDTO = new List<SaleDTO>();
-
-            if (sales == null || !sales.Any())
-                throw new InvalidOperationException("The sales list is empty.");
-
-            foreach (Sale sale in sales) {
-                salesDTO.Add(SaleDTO.FromSaleToDTO(sale)!);
+        public List<SaleDTO> GetSalesPerPeriod(DateOnly date1, DateOnly date2) {
+            if (date2 < date1) {
+                throw new ArgumentException("The second date must be greater than the first.");
             }
 
-            return salesDTO;
+            salesValidator.ValidateSalesList();
+            List<Sale> filteredList = context.Sales.Where(s => s.Date >= date1 && s.Date <= date2).ToList();
+            List<SaleDTO> filteredListDTO = filteredList.ConvertAll(sale => SaleDTO.FromSaleToDTO(sale)!);
+            salesValidator.ValidateFilteredList(filteredListDTO);
+
+            return filteredListDTO;
         }
 
-        private Sale ValidateSale(int id) {
-            Sale sale = context.Sales.Find(id)!;
 
-            if (sale == null)
-                throw new InvalidOperationException("The provided sale id couldn't be found.")!;
+        public List<SaleDTO> GetSalesAboveValue(decimal value) {
+            if (value <= 0) {
+                throw new ArgumentException("The value must be greater than 0.");
+            }
 
-            if (id != sale.Id)
-                throw new ArgumentException("The provided ids don't match.");
+            salesValidator.ValidateSalesList();
+            List<Sale> filteredList = context.Sales.Where(s => s.Price >= value).ToList();
+            List<SaleDTO> filteredListDTO = filteredList.ConvertAll(sale => SaleDTO.FromSaleToDTO(sale)!);
+            salesValidator.ValidateFilteredList(filteredListDTO);
 
-            return sale;
+            return filteredListDTO;
         }
 
     }
-
 }
