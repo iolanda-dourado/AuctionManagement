@@ -6,14 +6,30 @@ using System;
 namespace AuctionManagement.WebAPI.Services.Interfaces {
     public interface IItemsService {
 
+        public ItemDTO AddItem(ItemDTOCreate item);
+
         public List<ItemDTO> GetItems();
 
         public ItemDTO GetItemById(int id);
 
-        public ItemDTO AddItem(ItemDTOCreate item);
+        public List<ItemDTO> GetItemsByStatus(int status);
 
         public ItemDTO UpdateItem(int id, Item item);
 
         public ItemDTO DeleteItem(int id);
+
+
+        // Extra endpoints
+        public List<ItemDTO> GetItemsByCategory(int categId);
+
+        public List<ItemDTO> GetItemsUntilPrice(decimal price);
+
+        public List<ItemDTO> GetItemsSold();
+
+        public List<ItemDTO> GetItemsNotSold();
+
+        public List<ItemDTO> GetItemsSoldByCategory(int categId);
+
+        public List<ItemDTO> GetItemsNotSoldByCategory(int categId);
     }
 }
