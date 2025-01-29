@@ -3,6 +3,7 @@ using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
 using AuctionManagement.WebAPI.Services.Interfaces;
+using AuctionManagement.WebAPI.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,14 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuctionContext>(options => options.UseSqlServer
     (builder.Configuration.GetConnectionString("AuctionHouseDB"))
     );
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
 builder.Services.AddScoped<ISalesService, SalesService>();
+builder.Services.AddTransient<ItemsValidator>();
+builder.Services.AddTransient<SalesValidator>();
+builder.Services.AddTransient<CategoriesValidator>();
 
 
 var app = builder.Build();

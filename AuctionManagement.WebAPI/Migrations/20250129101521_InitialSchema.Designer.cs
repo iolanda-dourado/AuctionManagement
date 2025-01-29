@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AuctionManagement.WebAPI.Migrations
 {
     [DbContext(typeof(AuctionContext))]
-    [Migration("20250127214136_Initial")]
-    partial class Initial
+    [Migration("20250129101521_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
