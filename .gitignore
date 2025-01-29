@@ -2,6 +2,7 @@
 # .NET Core build folders
 bin/
 obj/
+AuctionManagement.WebAPI/obj/
 .vs/
 *.suo
 *.cache
