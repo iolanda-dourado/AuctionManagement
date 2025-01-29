@@ -25,10 +25,6 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <returns></returns>
         [HttpPost]
         public ActionResult<SaleDTO> Add(SaleDTOCreate saleDTOCreate) {
-            if (!ModelState.IsValid) {
-                return BadRequest(ModelState);
-            }
-
             try {
                 var createdSale = salesService.AddSale(saleDTOCreate);
 
@@ -39,8 +35,6 @@ namespace AuctionManagement.WebAPI.Controllers {
                 return CreatedAtAction(nameof(Add), new { id = createdSale.Id }, createdSale);
             }
             catch (InvalidOperationException ex) {
-                return BadRequest(new { message = ex.Message });
-            } catch (FormatException ex) {
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -77,9 +71,6 @@ namespace AuctionManagement.WebAPI.Controllers {
             catch (InvalidOperationException ex) {
                 return NotFound(new { message = ex.Message });
             }
-            catch (ArgumentException ex) {
-                return BadRequest(new { message = ex.Message });
-            }
         }
 
 
@@ -102,7 +93,8 @@ namespace AuctionManagement.WebAPI.Controllers {
             }
             catch (InvalidOperationException ex) {
                 return NotFound(new { message = ex.Message });
-            } catch (FormatException ex) {
+            }
+            catch (FormatException ex) {
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -127,6 +119,54 @@ namespace AuctionManagement.WebAPI.Controllers {
                 return BadRequest(new { message = ex.Message });
             }
 
+        }
+
+
+
+
+        /*
+         * ----------------- EXTRA ENDPOINTS -----------------
+         */
+
+        [HttpGet("totalsalesvaule")]
+        public ActionResult<decimal> GetTotalSalesValue() {
+            try {
+                return Ok(new { totalValue = salesService.GetTotalSalesValue() });
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("salesperperiod/date1/{date1}/date2{date2}")]
+        public ActionResult<IEnumerable<SaleDTO>> GetSalesPerPeriod(DateOnly date1, DateOnly date2) {
+            try {
+                return Ok(salesService.GetSalesPerPeriod(date1, date2));
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("abovevalue/{value}")]
+        public ActionResult<IEnumerable<SaleDTO>> GetTotalSalesAboveValue(decimal value) {
+            try {
+                return Ok(salesService.GetSalesAboveValue(value));
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex) {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }
