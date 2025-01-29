@@ -14,45 +14,10 @@ namespace AuctionManagement.WebAPI.Controllers {
 
     public class ItemsController : Controller {
 
-        private readonly IItemsService _itemsService;
+        private readonly IItemsService itemsService;
 
         public ItemsController(IItemsService itemsService) {
-            _itemsService = itemsService;
-        }
-
-
-
-        /// <summary>
-        /// Method to get all items
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult<IEnumerable<ItemDTO>> GetItems() {
-            var itemsDTO = _itemsService.GetItems();
-
-            if (itemsDTO == null || !itemsDTO.Any()) {
-                return NoContent();
-            }
-
-            return Ok(_itemsService.GetItems());
-        }
-
-        /// <summary>
-        /// Method to get an item by id
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public ActionResult<ItemDTO> GetById(int id) {
-
-            if (_itemsService == null)
-                return NotFound();
-
-            ItemDTO item = _itemsService.GetItemById(id);
-
-            if (item == null)
-                return NotFound();
-
-            return Ok(item);
+            this.itemsService = itemsService;
         }
 
 
@@ -62,9 +27,9 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <param name="itemDTOCreate"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult<ItemDTO> Add(ItemDTOCreate itemDTOCreate) {
+        public ActionResult<IEnumerable<ItemDTO>> Add(ItemDTOCreate itemDTOCreate) {
             try {
-                var createdItem = _itemsService.AddItem(itemDTOCreate);
+                var createdItem = itemsService.AddItem(itemDTOCreate);
 
                 if (createdItem == null) {
                     return BadRequest();
@@ -72,8 +37,41 @@ namespace AuctionManagement.WebAPI.Controllers {
 
                 return CreatedAtAction(nameof(Add), new { id = createdItem.Id }, createdItem);
             }
-            catch (ArgumentException ex) {
-                return BadRequest(ex.Message);
+            catch (InvalidOperationException ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult<IEnumerable<ItemDTO>> GetItems() {
+            try {
+                var itemsDTO = itemsService.GetItems();
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get an item by id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public ActionResult<IEnumerable<ItemDTO>> GetById(int id) {
+            try {
+                List<ItemDTO> items = itemsService.GetItems();
+                ItemDTO item = itemsService.GetItemById(id);
+                return Ok(item);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
             }
         }
 
@@ -86,14 +84,13 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <returns></returns>
         [HttpPut("{id}")]
         public ActionResult Update(int id, Item item) {
-
-            if (item.Id != id) {
-                return BadRequest();
+            try {
+                ItemDTO updatedItem = itemsService.UpdateItem(id, item);
+                return Ok(updatedItem);
             }
-
-            ItemDTO updatedItem = _itemsService.UpdateItem(id, item);
-
-            return Ok(updatedItem);
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
 
@@ -103,18 +100,115 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id) {
-            if (_itemsService == null)
+        public ActionResult Delete(int id) {
+            try {
+                ItemDTO itemDTO = itemsService.DeleteItem(id);
                 return NoContent();
-
-            ItemDTO itemDTO = _itemsService.GetItemById(id);
-
-            if (itemDTO == null)
-                return NotFound();
-
-            _itemsService.DeleteItem(id);
-            return NoContent();
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
+
+
+        /*
+         * -------------------- EXTRA ENDPOINTS --------------------
+         */
+
+        /// <summary>
+        /// Method to get all items from a certain category
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("categoryid/{categId}")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsByCategory(int categId) {
+            try {
+                var itemsDTO = itemsService.GetItemsByCategory(categId);
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items until a certain price
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("price/{price}")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItmsUntilPrice(decimal price) {
+            try {
+                var itemsDTO = itemsService.GetItemsUntilPrice(price);
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items sold
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("solditems")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsSold() {
+            try {
+                var itemsDTO = itemsService.GetItemsSold();
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items available
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("availableitems")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSold() {
+            try {
+                var itemsDTO = itemsService.GetItemsNotSold();
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items sold by category
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("solditemsbycategory/{categId}")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsSoldByCategory(int categId) {
+            try {
+                var itemsDTO = itemsService.GetItemsSoldByCategory(categId);
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to get all items available
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("availableitemsbycategory/{categId}")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSoldByCategory(int categId) {
+            try {
+                var itemsDTO = itemsService.GetItemsNotSoldByCategory(categId);
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
     }
 }
