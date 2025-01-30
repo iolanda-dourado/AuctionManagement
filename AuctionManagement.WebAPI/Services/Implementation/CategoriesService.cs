@@ -1,6 +1,5 @@
 ﻿using AuctionManagement.WebAPI.Data;
 using AuctionManagement.WebAPI.Dtos;
-using AuctionManagement.WebAPI.Enums;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
 using AuctionManagement.WebAPI.Validators;
@@ -66,9 +65,14 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+
+
+        /*
+         * ------------------------------- EXTRA ENDPOINTS -------------------------------
+         */
         public List<CategoryDTO> GetCategoriesWithItems() {
             List<Category> filteredList = context.Categories.Where
-                (c => c.Items.Count == 0)
+                (c => c.Items.Count != 0)
                 .Include(c => c.Items)
                 .ToList();
 
@@ -81,7 +85,7 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
         public List<CategoryDTO> GetCategoriesWithoutItems() {
             List<Category> filteredList = context.Categories.Where
-                (c => c.Items.Count > 0).ToList();
+                (c => c.Items.Count == 0).ToList();
             List<CategoryDTO> listDTO = filteredList.ConvertAll(category => CategoryDTO.FromCategoryToDTO(category)!);
 
             categoriesValidator.ValidateFilteredList(listDTO);

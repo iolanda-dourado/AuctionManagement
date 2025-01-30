@@ -35,6 +35,22 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole([FromBody] UserRole model) {
+            var user = await userManager.FindByNameAsync(model.Username);
+            if (user == null) {
+                return BadRequest("User not found");
+            }
+
+            var result = await userManager.AddToRoleAsync(user, model.Role);
+            if (result.Succeeded) {
+                return Ok(new { message = "Role assigned successfully" });
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login model) {
             var user = await userManager.FindByNameAsync(model.Username);
@@ -65,7 +81,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpPost("addrole")]
+        [HttpPost("add-role")]
         public async Task<IActionResult> AddRole([FromBody] string role) {
             if (!await roleManager.RoleExistsAsync(role)) {
                 var result = await roleManager.CreateAsync(new IdentityRole(role));
@@ -79,20 +95,5 @@ namespace AuctionManagement.WebAPI.Controllers {
             return BadRequest("Role already exists");
         }
 
-
-        [HttpPost("assignrole")]
-        public async Task<IActionResult> AssignRole([FromBody] UserRole model) {
-            var user = await userManager.FindByNameAsync(model.Username);
-            if (user == null) {
-                return BadRequest("User not found");
-            }
-
-            var result = await userManager.AddToRoleAsync(user, model.Role);
-            if (result.Succeeded) {
-                return Ok(new { message = "Role assigned successfully" });
-            }
-
-            return BadRequest(result.Errors);
-        }
     }
 }

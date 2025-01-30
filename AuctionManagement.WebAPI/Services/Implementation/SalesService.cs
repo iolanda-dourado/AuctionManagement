@@ -56,24 +56,24 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
-        public SaleDTO UpdateSale(int id, Sale sale) {
-            Sale existingSale = salesValidator.ValidateSale(id);
+        //public SaleDTO UpdateSale(int id, Sale sale) {
+        //    Sale existingSale = salesValidator.ValidateSale(id);
 
-            context.Entry(existingSale).CurrentValues.SetValues(sale);
-            context.SaveChanges();
+        //    context.Entry(existingSale).CurrentValues.SetValues(sale);
+        //    context.SaveChanges();
 
-            return SaleDTO.FromSaleToDTO(existingSale);
-        }
+        //    return SaleDTO.FromSaleToDTO(existingSale);
+        //}
 
 
-        public SaleDTO DeleteSale(int id) {
-            Sale sale = salesValidator.ValidateSale(id);
+        //public SaleDTO DeleteSale(int id) {
+        //    Sale sale = salesValidator.ValidateSale(id);
 
-            context.Remove(sale);
-            context.SaveChanges();
+        //    context.Remove(sale);
+        //    context.SaveChanges();
 
-            return SaleDTO.FromSaleToDTO(sale);
-        }
+        //    return SaleDTO.FromSaleToDTO(sale);
+        //}
 
 
 
@@ -90,6 +90,8 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
 
         public decimal GetTotalSalesValueByCategory(int categId) {
+            salesValidator.ValidateSalesList();
+            categoriesValidator.ValidateCategoryExistence(categId);
             return context.Items.Where(i => i.CategoryId == categId).Sum(i => i.Price);
         }
 
@@ -102,6 +104,8 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
         public int GetTotalSalesQuantityByCategory(int categId) {
+            salesValidator.ValidateSalesList();
+            categoriesValidator.ValidateCategoryExistence(categId);
             return context.Items.Count(i => i.CategoryId == categId);
         }
 
@@ -113,7 +117,9 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
             salesValidator.ValidateSalesList();
             List<Sale> filteredList = context.Sales.Where(s => s.Date >= date1 && s.Date <= date2).ToList();
-            List<SaleDTO> filteredListDTO = filteredList.ConvertAll(sale => SaleDTO.FromSaleToDTO(sale)!);
+            List<SaleDTO> filteredListDTO = filteredList.ConvertAll(sale => SaleDTO.FromSaleToDTO(sale)!)
+                .OrderBy(s => s.Date)
+                .ToList();
             salesValidator.ValidateFilteredList(filteredListDTO);
 
             return filteredListDTO;

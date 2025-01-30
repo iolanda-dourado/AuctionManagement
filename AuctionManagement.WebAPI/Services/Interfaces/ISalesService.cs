@@ -11,9 +11,9 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
 
         public SaleDTO GetSaleById(int id);
 
-        public SaleDTO UpdateSale(int id, Sale sale);
+        //public SaleDTO UpdateSale(int id, Sale sale);
 
-        public SaleDTO DeleteSale(int id);
+        //public SaleDTO DeleteSale(int id);
 
 
         // EXTRA ENDPOINTS

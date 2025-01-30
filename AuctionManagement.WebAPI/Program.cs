@@ -58,7 +58,16 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
 });
 
+// Registra o serviço para o AutoSeedData
+builder.Services.AddTransient<AutoSeedData>();
+
 var app = builder.Build();
+
+// Chama o método de reinicialização e população da base de dados
+using (var scope = app.Services.CreateScope()) {
+    var autoSeedData = scope.ServiceProvider.GetRequiredService<AutoSeedData>();
+    autoSeedData.ResetDatabase();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {

@@ -81,54 +81,42 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
+        //[Authorize(Roles = "Admin")]
+        //[HttpPut("{id}")]
+        //public ActionResult Update(int id, Sale sale) {
+        //    try {
+        //        SaleDTO updatedSale = salesService.UpdateSale(id, sale);
 
-        /// <summary>
-        /// Method that update a sale by receiving its id and its JSON body
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="sale"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}")]
-        public ActionResult Update(int id, Sale sale) {
-            try {
-                SaleDTO updatedSale = salesService.UpdateSale(id, sale);
+        //        return Ok(updatedSale);
+        //    }
+        //    catch (ArgumentException ex) {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //    catch (InvalidOperationException ex) {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (FormatException ex) {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
 
-                return Ok(updatedSale);
-            }
-            catch (ArgumentException ex) {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex) {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (FormatException ex) {
-                return BadRequest(new { message = ex.Message });
-            }
-
-        }
+        //}
 
 
-        /// <summary>
-        /// Method that deletes an sale with the id received as parameter
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id) {
-            try {
-                salesService.DeleteSale(id);
-                return NoContent();
-            }
-            catch (ArgumentException ex) {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex) {
-                return BadRequest(new { message = ex.Message });
-            }
+        //[Authorize(Roles = "Admin")]
+        //[HttpDelete("{id}")]
+        //public IActionResult Delete(int id) {
+        //    try {
+        //        salesService.DeleteSale(id);
+        //        return NoContent();
+        //    }
+        //    catch (ArgumentException ex) {
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (InvalidOperationException ex) {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
 
-        }
+        //}
 
 
 
@@ -186,7 +174,7 @@ namespace AuctionManagement.WebAPI.Controllers {
 
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("per-period/date1/{date1}/date2{date2}")]
+        [HttpGet("per-period/date1/{date1}/date2/{date2}")]
         public ActionResult<IEnumerable<SaleDTO>> GetSalesPerPeriod(DateOnly date1, DateOnly date2) {
             try {
                 return Ok(salesService.GetSalesPerPeriod(date1, date2));

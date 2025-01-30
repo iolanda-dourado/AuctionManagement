@@ -129,7 +129,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all categories with items
         /// </summary>
         /// <returns></returns>
-        [HttpGet("with-items")]
+        [HttpGet("contain-items")]
         public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithItems() {
             try {
                 List<CategoryDTO> categoriesDTO = categoriesService.GetCategoriesWithItems();
@@ -147,7 +147,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all categories without items
         /// </summary>
         /// <returns></returns>
-        [HttpGet("withoutitems")]
+        [HttpGet("dont-contain-items")]
         public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithoutItems() {
             try {
                 List<CategoryDTO> categoriesDTO = categoriesService.GetCategoriesWithoutItems();
