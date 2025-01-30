@@ -129,7 +129,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all categories with items
         /// </summary>
         /// <returns></returns>
-        [HttpGet("withitems")]
+        [HttpGet("with-items")]
         public ActionResult<IEnumerable<CategoryDTO>> GetCategoriesWithItems() {
             try {
                 List<CategoryDTO> categoriesDTO = categoriesService.GetCategoriesWithItems();

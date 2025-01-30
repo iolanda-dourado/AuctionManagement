@@ -21,7 +21,7 @@ namespace AuctionManagement.WebAPI.Validators {
 
         public void ValidateItemStatus(Item item) {
             if (item.Status == Status.Sold) {
-                throw new InvalidOperationException("The item was already sold.");
+                throw new InvalidOperationException("It was impossible to conclude this action because the item was already sold.");
             }
         }
 

@@ -3,6 +3,7 @@ using AuctionManagement.WebAPI.Dtos;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Implementation;
 using AuctionManagement.WebAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionManagement.WebAPI.Controllers {
@@ -26,6 +27,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="itemDTOCreate"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<IEnumerable<ItemDTO>> Add(ItemDTOCreate itemDTOCreate) {
             try {
@@ -47,6 +49,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all items
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<ItemDTO>> GetItems() {
             try {
@@ -82,8 +85,9 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <param name="id"></param>
         /// <param name="item"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public ActionResult Update(int id, Item item) {
+        public ActionResult Update(int id, ItemDTOUpdate item) {
             try {
                 ItemDTO updatedItem = itemsService.UpdateItem(id, item);
                 return Ok(updatedItem);
@@ -99,6 +103,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public ActionResult Delete(int id) {
             try {
@@ -152,7 +157,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all items sold
         /// </summary>
         /// <returns></returns>
-        [HttpGet("solditems")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("sold-items")]
         public ActionResult<IEnumerable<ItemDTO>> GetItemsSold() {
             try {
                 var itemsDTO = itemsService.GetItemsSold();
@@ -168,7 +174,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all items available
         /// </summary>
         /// <returns></returns>
-        [HttpGet("availableitems")]
+        [HttpGet("available-items")]
         public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSold() {
             try {
                 var itemsDTO = itemsService.GetItemsNotSold();
@@ -184,7 +190,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all items sold by category
         /// </summary>
         /// <returns></returns>
-        [HttpGet("solditemsbycategory/{categId}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("sold-items-by-category/{categId}")]
         public ActionResult<IEnumerable<ItemDTO>> GetItemsSoldByCategory(int categId) {
             try {
                 var itemsDTO = itemsService.GetItemsSoldByCategory(categId);
@@ -200,7 +207,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all items available
         /// </summary>
         /// <returns></returns>
-        [HttpGet("availableitemsbycategory/{categId}")]
+        [HttpGet("available-items-by-category/{categId}")]
         public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSoldByCategory(int categId) {
             try {
                 var itemsDTO = itemsService.GetItemsNotSoldByCategory(categId);

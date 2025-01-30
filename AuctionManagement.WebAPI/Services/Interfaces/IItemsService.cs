@@ -12,9 +12,7 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
 
         public ItemDTO GetItemById(int id);
 
-        public List<ItemDTO> GetItemsByStatus(int status);
-
-        public ItemDTO UpdateItem(int id, Item item);
+        public ItemDTO UpdateItem(int id, ItemDTOUpdate item);
 
         public ItemDTO DeleteItem(int id);
 

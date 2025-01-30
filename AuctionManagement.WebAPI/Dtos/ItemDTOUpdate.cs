@@ -3,7 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace AuctionManagement.WebAPI.Dtos {
-    public class ItemDTOCreate {
+    public class ItemDTOUpdate {
+
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "The item name is required.")]
         [MaxLength(60, ErrorMessage = "The item name cannot exceed 60 characters.")]
         public string Name { get; set; } = null!;

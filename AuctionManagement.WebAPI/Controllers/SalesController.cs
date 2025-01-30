@@ -24,7 +24,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="saleDTOCreate"></param>
         /// <returns></returns>
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "User")]
         [HttpPost]
         public ActionResult<SaleDTO> Add(SaleDTOCreate saleDTOCreate) {
             try {
@@ -68,6 +68,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get a sale by id
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "Admin, User")]
         [HttpGet("{id}")]
         public ActionResult<SaleDTO> GetById(int id) {
             try {
@@ -136,7 +137,8 @@ namespace AuctionManagement.WebAPI.Controllers {
          * ----------------- EXTRA ENDPOINTS -----------------
          */
 
-        [HttpGet("totalsalesvalue")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("total-value")]
         public ActionResult<decimal> GetTotalSalesValue() {
             try {
                 return Ok(new { totalValue = salesService.GetTotalSalesValue() });
@@ -147,7 +149,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpGet("totalsalesvaluebycategory/{categId}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("total-value-by-category/{categId}")]
         public ActionResult<decimal> GetTotalSalesValueByCategory(int categId) {
             try {
                 return Ok(new { totalValue = salesService.GetTotalSalesValueByCategory(categId) });
@@ -158,7 +161,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpGet("totalquantity")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("total-quantity")]
         public ActionResult<decimal> GetTotalSalesQuantity() {
             try {
                 return Ok(new { totalQuantity = salesService.GetTotalSalesQuantity() });
@@ -169,7 +173,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpGet("totalquantitybycategory/{categId}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("total-quantity-by-category/{categId}")]
         public ActionResult<decimal> GetTotalSalesQuantity(int categId) {
             try {
                 return Ok(new { totalQuantity = salesService.GetTotalSalesQuantityByCategory(categId)});
@@ -180,7 +185,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpGet("salesperperiod/date1/{date1}/date2{date2}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("per-period/date1/{date1}/date2{date2}")]
         public ActionResult<IEnumerable<SaleDTO>> GetSalesPerPeriod(DateOnly date1, DateOnly date2) {
             try {
                 return Ok(salesService.GetSalesPerPeriod(date1, date2));
@@ -194,7 +200,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
-        [HttpGet("abovevalue/{value}")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet("above-value/{value}")]
         public ActionResult<IEnumerable<SaleDTO>> GetTotalSalesAboveValue(decimal value) {
             try {
                 return Ok(salesService.GetSalesAboveValue(value));

@@ -1,5 +1,6 @@
 ﻿using AuctionManagement.WebAPI.Data;
 using AuctionManagement.WebAPI.Dtos;
+using AuctionManagement.WebAPI.Enums;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
 using AuctionManagement.WebAPI.Validators;
@@ -26,7 +27,7 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             Item item = new Item {
                 Name = itemDTO.Name,
                 Price = itemDTO.Price,
-                Status = itemDTO.Status,
+                Status = Status.Available,
                 CategoryId = category.Id,
                 Category = category
             };
@@ -52,14 +53,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
-        public List<ItemDTO> GetItemsByStatus(int status) {
-            return null;
-        }
-
-
-        public ItemDTO UpdateItem(int id, Item item) {
+        public ItemDTO UpdateItem(int id, ItemDTOUpdate item) {
             Item existingItem = itemsValidator.ValidateItemExistence(id);
             Category category = categoriesValidator.ValidateCategoryExistence(item.CategoryId);
+            itemsValidator.ValidateItemStatus(existingItem);
 
             context.Entry(existingItem).CurrentValues.SetValues(item);
             context.SaveChanges();
