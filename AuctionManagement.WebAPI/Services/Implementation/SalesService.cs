@@ -4,6 +4,7 @@ using AuctionManagement.WebAPI.Enums;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
 using AuctionManagement.WebAPI.Validators;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuctionManagement.WebAPI.Services.Implementation {
     public class SalesService : ISalesService {
@@ -11,11 +12,13 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         private readonly AuctionContext context;
         private readonly SalesValidator salesValidator;
         private readonly ItemsValidator itemsValidator;
+        private readonly CategoriesValidator categoriesValidator;
 
-        public SalesService(AuctionContext context, ItemsValidator itemsValidator, SalesValidator salesValidator) {
+        public SalesService(AuctionContext context, ItemsValidator itemsValidator, SalesValidator salesValidator, CategoriesValidator categoriesValidator) {
             this.context = context;
             this.itemsValidator = itemsValidator;
             this.salesValidator = salesValidator;
+            this.categoriesValidator = categoriesValidator;
         }
 
 
@@ -84,6 +87,23 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             decimal totalValue = context.Sales.Sum(s => s.Price);
 
             return totalValue;
+        }
+
+
+        public decimal GetTotalSalesValueByCategory(int categId) {
+            return context.Items.Where(i => i.CategoryId == categId).Sum(i => i.Price);
+        }
+
+
+        public int GetTotalSalesQuantity() {
+            salesValidator.ValidateSalesList();
+            int totalQuantity = context.Sales.Count();
+
+            return totalQuantity;
+        }
+
+        public int GetTotalSalesQuantityByCategory(int categId) {
+            return context.Items.Count(i => i.CategoryId == categId);
         }
 
 

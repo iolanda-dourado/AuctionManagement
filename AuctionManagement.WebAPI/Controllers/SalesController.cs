@@ -136,7 +136,7 @@ namespace AuctionManagement.WebAPI.Controllers {
          * ----------------- EXTRA ENDPOINTS -----------------
          */
 
-        [HttpGet("totalsalesvaule")]
+        [HttpGet("totalsalesvalue")]
         public ActionResult<decimal> GetTotalSalesValue() {
             try {
                 return Ok(new { totalValue = salesService.GetTotalSalesValue() });
@@ -144,7 +144,37 @@ namespace AuctionManagement.WebAPI.Controllers {
             catch (InvalidOperationException ex) {
                 return NotFound(new { message = ex.Message });
             }
-            catch (ArgumentException ex) {
+        }
+
+
+        [HttpGet("totalsalesvaluebycategory/{categId}")]
+        public ActionResult<decimal> GetTotalSalesValueByCategory(int categId) {
+            try {
+                return Ok(new { totalValue = salesService.GetTotalSalesValueByCategory(categId) });
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("totalquantity")]
+        public ActionResult<decimal> GetTotalSalesQuantity() {
+            try {
+                return Ok(new { totalQuantity = salesService.GetTotalSalesQuantity() });
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("totalquantitybycategory/{categId}")]
+        public ActionResult<decimal> GetTotalSalesQuantity(int categId) {
+            try {
+                return Ok(new { totalQuantity = salesService.GetTotalSalesQuantityByCategory(categId)});
+            }
+            catch (InvalidOperationException ex) {
                 return NotFound(new { message = ex.Message });
             }
         }

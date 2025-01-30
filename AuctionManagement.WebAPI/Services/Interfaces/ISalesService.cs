@@ -19,6 +19,12 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
         // EXTRA ENDPOINTS
         public decimal GetTotalSalesValue();
 
+        public decimal GetTotalSalesValueByCategory(int categId);
+
+        public int GetTotalSalesQuantity();
+
+        public int GetTotalSalesQuantityByCategory(int categId);
+
         public List<SaleDTO> GetSalesPerPeriod(DateOnly date1, DateOnly date2);
 
         public List<SaleDTO> GetSalesAboveValue(decimal value);
