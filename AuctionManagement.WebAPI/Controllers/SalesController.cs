@@ -39,6 +39,9 @@ namespace AuctionManagement.WebAPI.Controllers {
             catch (InvalidOperationException ex) {
                 return BadRequest(new { message = ex.Message });
             }
+            catch (ArgumentException ex) {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
 
