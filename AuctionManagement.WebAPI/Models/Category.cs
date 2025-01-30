@@ -27,5 +27,10 @@ namespace AuctionManagement.WebAPI.Models {
         public static Category FromDTOToCategory(CategoryDTO categoryDTO) {
             return new Category(categoryDTO.Id, categoryDTO.Description);
         }
+
+        public override bool Equals(object? obj) {
+            return obj is Category category &&
+                   Description == category.Description;
+        }
     }
 }

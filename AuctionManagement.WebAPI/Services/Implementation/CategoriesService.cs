@@ -21,11 +21,12 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             Category category = new Category {
                 Description = categDTO.Description
             };
+            categoriesValidator.IsCategoryEqualToAnother(category.Description);
 
             context.Categories.Add(category);
             context.SaveChanges();
 
-            return CategoryDTO.FromCategoryToDTO(category);
+            return CategoryDTO.FromCategoryToDTO(category)!;
         }
 
 
@@ -44,11 +45,24 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
         public CategoryDTO UpdateCategory(int id, Category category) {
             Category existingCateg = categoriesValidator.ValidateCategoryExistence(id);
+            categoriesValidator.IsItemsListEmpty(category);
+            categoriesValidator.IsCategoryEqualToAnother(category.Description);
 
             context.Entry(existingCateg).CurrentValues.SetValues(category);
             context.SaveChanges();
 
             return CategoryDTO.FromCategoryToDTO(existingCateg)!;
+        }
+
+
+        public CategoryDTO DeleteCategory(int id) {
+            Category category = categoriesValidator.ValidateCategoryExistence(id);
+            categoriesValidator.IsItemsListEmpty(category);
+
+            context.Remove(category);
+            context.SaveChanges();
+
+            return CategoryDTO.FromCategoryToDTO(category!)!;
         }
 
 
@@ -74,16 +88,6 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
             return listDTO;
         }
-
-
-        public CategoryDTO DeleteCategory(int id) {
-            Category category = categoriesValidator.ValidateCategoryExistence(id);
-            categoriesValidator.IsItemsListEmpty(category);
-
-            context.Remove(category);
-            context.SaveChanges();
-
-            return CategoryDTO.FromCategoryToDTO(category!)!;
-        }
     }
+
 }

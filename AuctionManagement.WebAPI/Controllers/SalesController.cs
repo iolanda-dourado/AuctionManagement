@@ -1,6 +1,7 @@
 ﻿using AuctionManagement.WebAPI.Dtos;
 using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionManagement.WebAPI.Controllers {
@@ -23,6 +24,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="saleDTOCreate"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<SaleDTO> Add(SaleDTOCreate saleDTOCreate) {
             try {
@@ -44,6 +46,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// Method to get all sales
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<SaleDTO>> GetSales() {
             try {
@@ -81,6 +84,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// <param name="id"></param>
         /// <param name="sale"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public ActionResult Update(int id, Sale sale) {
             try {
@@ -106,6 +110,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id) {
             try {

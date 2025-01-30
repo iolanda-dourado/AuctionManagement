@@ -20,12 +20,22 @@ namespace AuctionManagement.WebAPI.Validators {
         }
 
 
+        public void IsCategoryEqualToAnother(string categDesc) {
+            var categories = context.Categories.ToList();
+            foreach (Category cat in categories) {
+                if (cat.Description.Equals(categDesc)) {
+                    throw new ArgumentException("The category already exists. Try again with another description.");
+                }
+            }
+        }
+
+
         public List<CategoryDTO> ValidateCategoriesList() {
             var categories = context.Categories.ToList();
             var categoriesDTO = new List<CategoryDTO>();
 
             if (categories == null || !categories.Any()) {
-                throw new InvalidOperationException("The categories list is empty.");
+                throw new InvalidOperationException("The items list is empty.");
             }
 
             foreach (Category category in categories) {
@@ -38,16 +48,16 @@ namespace AuctionManagement.WebAPI.Validators {
 
         public void ValidateFilteredList(List<CategoryDTO> categoriesDTO) {
             if (categoriesDTO == null || categoriesDTO.Count == 0) {
-                throw new InvalidOperationException("No categories attended to the criterias.");
+                throw new InvalidOperationException("No items attended to the criterias.");
             }
         }
 
 
         public void IsItemsListEmpty(Category category) {
-            List<Item> categories = category.Items.ToList();
+            List<Item> items = category.Items.ToList();
 
-            if (categories.Count < 1) {
-                throw new ArgumentException("Impossible to exclude this category because its items list is not empty.");
+            if (items.Count != 0) {
+                throw new ArgumentException("Impossible to conclude this action because the category items list is not empty.");
             }
         }
     }

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctionManagement.WebAPI.Data {
-    public class AuctionContext : DbContext {
+    public class AuctionContext : AuthDbContext {
 
         public AuctionContext(DbContextOptions<AuctionContext> options) : base(options) { }
 
