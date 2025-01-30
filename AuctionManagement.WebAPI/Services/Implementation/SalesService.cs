@@ -19,18 +19,18 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
-        public SaleDTO AddSale(SaleDTOCreate saleDTO) {
-            var item = itemsValidator.ValidateItemExistence(saleDTO.ItemId);
-            salesValidator.ValidateSaleDate(saleDTO.Date);
+        public SaleDTO AddSale(SaleDTOCreate saleDTOCreate) {
+            var item = itemsValidator.ValidateItemExistence(saleDTOCreate.ItemId);
             itemsValidator.ValidateItemStatus(item);
+            salesValidator.ValidateSalePrice(saleDTOCreate);
 
             Sale sale = new Sale {
-                Date = saleDTO.Date,
-                Price = saleDTO.Price,
-                ItemId = saleDTO.ItemId,
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Price = saleDTOCreate.Price,
+                ItemId = saleDTOCreate.ItemId,
             };
 
-            context.Items.Find(saleDTO.ItemId)!.Status = Status.Sold;
+            context.Items.Find(saleDTOCreate.ItemId)!.Status = Status.Sold;
 
             context.Sales.Add(sale);
             context.SaveChanges();
@@ -55,7 +55,6 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
         public SaleDTO UpdateSale(int id, Sale sale) {
             Sale existingSale = salesValidator.ValidateSale(id);
-            salesValidator.ValidateSaleDate(sale.Date);
 
             context.Entry(existingSale).CurrentValues.SetValues(sale);
             context.SaveChanges();

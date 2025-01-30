@@ -39,12 +39,19 @@ namespace AuctionManagement.WebAPI.Validators {
         }
 
 
-        public void ValidateSaleDate(DateOnly saleDate) {
-            var currentDate = DateOnly.FromDateTime(DateTime.Now);
-            var maxDate = new DateOnly(2024, 1, 28);
-            if (saleDate < maxDate || saleDate > currentDate) {
-                throw new InvalidOperationException("The sale date must be between 28/01/2024 and today.");
+        public void ValidateSalePrice(SaleDTOCreate saleDTOCreate) {
+            Item item = context.Items.Find(saleDTOCreate.ItemId)!;
+            if (saleDTOCreate.Price < item.Price) {
+                throw new ArgumentException("The sale price cannot be lesser than the item price.");
             }
         }
+
+        //public void ValidateSaleDate(DateOnly saleDate) {
+        //    var currentDate = DateOnly.FromDateTime(DateTime.Now);
+        //    var maxDate = new DateOnly(2024, 1, 28);
+        //    if (saleDate < maxDate || saleDate > currentDate) {
+        //        throw new InvalidOperationException("The sale date must be between 28/01/2024 and today.");
+        //    }
+        //}
     }
 }

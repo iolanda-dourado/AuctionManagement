@@ -14,7 +14,7 @@ namespace AuctionManagement.WebAPI.Models {
 
         [Required(ErrorMessage = "The sale price is required.")]
         [Range(1, double.MaxValue, ErrorMessage = "The price must be greater than zero.")]
-        [Column(TypeName = "decimal(6,2)")]
+        [Column(TypeName = "decimal(15,2)")]
         public decimal Price { get; set; }
 
 
