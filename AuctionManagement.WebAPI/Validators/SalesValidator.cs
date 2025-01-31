@@ -46,7 +46,7 @@ namespace AuctionManagement.WebAPI.Validators {
             var sales = context.Sales.ToList();
             var salesDTO = new List<SaleDTO>();
 
-            if (sales == null || !sales.Any())
+            if (sales == null || sales.Count == 0)
                 throw new InvalidOperationException("The sales list is empty.");
 
             foreach (Sale sale in sales) {

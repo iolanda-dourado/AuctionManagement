@@ -1,6 +1,7 @@
 ﻿using AuctionManagement.WebAPI.Data;
 using AuctionManagement.WebAPI.Dtos;
 using AuctionManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuctionManagement.WebAPI.Validators {
 
@@ -24,10 +25,12 @@ namespace AuctionManagement.WebAPI.Validators {
         /// <returns>The category if it exists.</returns>
         /// <exception cref="InvalidOperationException">If the category does not exist.</exception>
         public Category ValidateCategoryExistence(int categId) {
-            var category = context.Categories.Find(categId);
+            var category = context.Categories
+                .Include(c => c.Items) // Eager loading dos itens
+                .FirstOrDefault(c => c.Id == categId);
 
             if (category == null) {
-                throw new InvalidOperationException("The category id doesn't match any existing category.");
+                throw new InvalidOperationException("Category not found.");
             }
 
             return category;
@@ -88,10 +91,8 @@ namespace AuctionManagement.WebAPI.Validators {
         /// <param name="category">The category to check.</param>
         /// <exception cref="ArgumentException">If the items list is not empty.</exception>
         public void IsItemsListEmpty(Category category) {
-            List<Item> items = category.Items.ToList();
-
-            if (items.Count != 0) {
-                throw new ArgumentException("Impossible to conclude this action because the category items list is not empty.");
+            if (category.Items.Any()) {
+                throw new ArgumentException("Category items list is not empty, cannot proceed with deletion or update.");
             }
         }
     }

@@ -52,7 +52,7 @@ namespace AuctionManagement.WebAPI.Validators {
             var items = context.Items.ToList();
             var itemsDTO = new List<ItemDTO>();
 
-            if (items == null || !items.Any()) {
+            if (items == null || items.Count == 0) {
                 throw new InvalidOperationException("The items list is empty.");
             }
             

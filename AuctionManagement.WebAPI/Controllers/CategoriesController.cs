@@ -145,7 +145,7 @@ namespace AuctionManagement.WebAPI.Controllers {
                 return NotFound(new { message = ex.Message });
             }
             catch (ArgumentException ex) {
-                return NotFound(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
 

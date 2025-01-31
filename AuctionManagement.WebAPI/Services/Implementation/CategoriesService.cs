@@ -75,15 +75,17 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// <param name="category">The updated category.</param>
         /// <returns>The updated category as a DTO.</returns>
         public CategoryDTO UpdateCategory(int id, Category category) {
-            Category existingCateg = categoriesValidator.ValidateCategoryExistence(id);
-            categoriesValidator.IsItemsListEmpty(category);
-            categoriesValidator.IsCategoryEqualToAnother(category.Description);
+            Category existingCateg = categoriesValidator.ValidateCategoryExistence(id);  // Valida a existência da categoria
+            categoriesValidator.IsItemsListEmpty(existingCateg);  // Verifica se a lista de itens está vazia
+
+            categoriesValidator.IsCategoryEqualToAnother(category.Description);  // Valida se a descrição é diferente
 
             context.Entry(existingCateg).CurrentValues.SetValues(category);
             context.SaveChanges();
 
             return CategoryDTO.FromCategoryToDTO(existingCateg)!;
         }
+
 
 
         /// <summary>
