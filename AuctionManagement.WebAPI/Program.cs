@@ -1,5 +1,4 @@
 using AuctionManagement.WebAPI.Data;
-using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Implementation;
 using Microsoft.EntityFrameworkCore;
 using AuctionManagement.WebAPI.Services.Interfaces;
@@ -48,7 +47,6 @@ builder.Services.AddAuthentication(options => {
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-
         };
     });
 

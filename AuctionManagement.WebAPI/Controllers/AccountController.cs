@@ -9,20 +9,39 @@ using System.Security.Claims;
 using System.Text;
 
 namespace AuctionManagement.WebAPI.Controllers {
+
+    /// <summary>
+    /// Controller for handling user authentication and authorization
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase {
 
+        /// <summary>
+        /// User manager and role manager for managing users and roles
+        /// </summary>
         private readonly UserManager<IdentityUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration configuration;
 
+        /// <summary>
+        /// Constructor for the AccountController
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="roleManager"></param>
+        /// <param name="configuration"></param>
         public AccountController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration) {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.configuration = configuration;
         }
 
+
+        /// <summary>
+        /// Handles HTTP POST requests to register a new user.
+        /// </summary>
+        /// <param name="model">The registration model containing the username and password.</param>
+        /// <returns>An IActionResult indicating the result of the registration attempt.</returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] Register model) {
             var user = new IdentityUser { UserName = model.Username };
@@ -35,6 +54,11 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
+        /// <summary>
+        /// Assigns a role to a user.
+        /// </summary>
+        /// <param name="model">The UserRole model containing the username and role to assign.</param>
+        /// <returns>An IActionResult indicating the result of the role assignment attempt.</returns>
         [HttpPost("assign-role")]
         public async Task<IActionResult> AssignRole([FromBody] UserRole model) {
             var user = await userManager.FindByNameAsync(model.Username);
@@ -51,6 +75,11 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
+        /// <summary>
+        /// Handles HTTP POST requests to authenticate a user.
+        /// </summary>
+        /// <param name="model">The Login model containing the username and password.</param>
+        /// <returns>An IActionResult indicating the result of the authentication attempt.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login model) {
             var user = await userManager.FindByNameAsync(model.Username);
@@ -81,6 +110,11 @@ namespace AuctionManagement.WebAPI.Controllers {
         }
 
 
+        /// <summary>
+        /// Handles HTTP POST requests to add a new role.
+        /// </summary>
+        /// <param name="role">The name of the role to add.</param>
+        /// <returns>An IActionResult indicating the result of the role addition attempt.</returns>
         [HttpPost("add-role")]
         public async Task<IActionResult> AddRole([FromBody] string role) {
             if (!await roleManager.RoleExistsAsync(role)) {

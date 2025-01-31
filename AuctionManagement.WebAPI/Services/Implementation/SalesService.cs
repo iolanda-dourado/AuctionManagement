@@ -7,13 +7,40 @@ using AuctionManagement.WebAPI.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctionManagement.WebAPI.Services.Implementation {
+
+    /// <summary>
+    /// Provides methods for managing sales in the auction system.
+    /// </summary>
     public class SalesService : ISalesService {
 
+        /// <summary>
+        /// The database context for the auction system.
+        /// </summary>
         private readonly AuctionContext context;
+
+        /// <summary>
+        /// The validator for sales in the auction system.
+        /// </summary>
         private readonly SalesValidator salesValidator;
+
+        /// <summary>
+        /// The validator for items in the auction system.
+        /// </summary>
         private readonly ItemsValidator itemsValidator;
+
+        /// <summary>
+        /// The validator for categories in the auction system.
+        /// </summary>
         private readonly CategoriesValidator categoriesValidator;
 
+
+        /// <summary>
+        /// Initializes a new instance of the SalesService class.
+        /// </summary>
+        /// <param name="context">The database context for the auction system.</param>
+        /// <param name="itemsValidator">The validator for items in the auction system.</param>
+        /// <param name="salesValidator">The validator for sales in the auction system.</param>
+        /// <param name="categoriesValidator">The validator for categories in the auction system.</param>
         public SalesService(AuctionContext context, ItemsValidator itemsValidator, SalesValidator salesValidator, CategoriesValidator categoriesValidator) {
             this.context = context;
             this.itemsValidator = itemsValidator;
@@ -22,6 +49,11 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Adds a new sale to the auction system.
+        /// </summary>
+        /// <param name="saleDTOCreate">The sale to add.</param>
+        /// <returns>The added sale as a DTO.</returns>
         public SaleDTO AddSale(SaleDTOCreate saleDTOCreate) {
             var item = itemsValidator.ValidateItemExistence(saleDTOCreate.ItemId);
             itemsValidator.ValidateItemStatus(item);
@@ -42,6 +74,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves a list of all sales in the auction system.
+        /// </summary>
+        /// <returns>A list of sales as DTOs.</returns>
         public List<SaleDTO> GetSales() {
             List<SaleDTO> salesDTO = salesValidator.ValidateSalesList();
 
@@ -49,6 +85,11 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves a sale by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the sale to retrieve.</param>
+        /// <returns>The sale as a DTO.</returns>
         public SaleDTO GetSaleById(int id) {
             Sale sale = salesValidator.ValidateSale(id);
 
@@ -81,6 +122,8 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /*
          * ----------------- EXTRA ENDPOINTS -----------------
          */
+
+
         public decimal GetTotalSalesValue() {
             salesValidator.ValidateSalesList();
             decimal totalValue = context.Sales.Sum(s => s.Price);
@@ -89,6 +132,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves the total value of all sales in the auction system.
+        /// </summary>
+        /// <returns>The total value of all sales as a decimal.</returns>
         public decimal GetTotalSalesValueByCategory(int categId) {
             salesValidator.ValidateSalesList();
             categoriesValidator.ValidateCategoryExistence(categId);
@@ -96,6 +143,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves the total quantity of all sales in the auction system.
+        /// </summary>
+        /// <returns>The total quantity of all sales as an integer.</returns>
         public int GetTotalSalesQuantity() {
             salesValidator.ValidateSalesList();
             int totalQuantity = context.Sales.Count();
@@ -103,6 +154,12 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             return totalQuantity;
         }
 
+
+        /// <summary>
+        /// Retrieves the total quantity of sales in a specific category.
+        /// </summary>
+        /// <param name="categId">The ID of the category to retrieve sales from.</param>
+        /// <returns>The total quantity of sales in the category as an integer.</returns>
         public int GetTotalSalesQuantityByCategory(int categId) {
             salesValidator.ValidateSalesList();
             categoriesValidator.ValidateCategoryExistence(categId);
@@ -110,6 +167,12 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves a list of sales that occurred within a specified date range.
+        /// </summary>
+        /// <param name="date1">The start date of the range (inclusive).</param>
+        /// <param name="date2">The end date of the range (inclusive).</param>
+        /// <returns>A list of sales as DTOs that occurred between date1 and date2.</returns>
         public List<SaleDTO> GetSalesPerPeriod(DateOnly date1, DateOnly date2) {
             if (date2 < date1) {
                 throw new ArgumentException("The second date must be greater than the first.");
@@ -126,6 +189,11 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         }
 
 
+        /// <summary>
+        /// Retrieves a list of sales with a price greater than or equal to the specified value.
+        /// </summary>
+        /// <param name="value">The minimum price of the sales to retrieve.</param>
+        /// <returns>A list of sales as DTOs with prices greater than or equal to the specified value.</returns>
         public List<SaleDTO> GetSalesAboveValue(decimal value) {
             if (value <= 0) {
                 throw new ArgumentException("The value must be greater than 0.");
