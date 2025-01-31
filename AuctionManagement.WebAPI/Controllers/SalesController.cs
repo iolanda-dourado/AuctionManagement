@@ -24,7 +24,7 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <param name="saleDTOCreate"></param>
         /// <returns></returns>
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<SaleDTO> Add(SaleDTOCreate saleDTOCreate) {
             try {
