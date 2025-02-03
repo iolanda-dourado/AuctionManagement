@@ -210,12 +210,10 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <returns>A list of ItemDTO objects representing the unsold items.</returns>
         /// <remarks>
-        /// This method requires authorization with the Admin role.
         /// If an error occurs while retrieving the unsold items, a NotFound result is returned with a message describing the error.
         /// </remarks>
         /// <response code="200">The unsold items were successfully retrieved.</response>
         /// <response code="404">No unsold items were found.</response>
-        [Authorize(Roles = "Admin")]
         [HttpGet("available-items")]
         public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSold() {
             try {
