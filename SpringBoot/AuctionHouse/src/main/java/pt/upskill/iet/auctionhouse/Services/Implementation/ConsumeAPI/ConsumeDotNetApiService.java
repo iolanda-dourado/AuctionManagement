@@ -2,9 +2,11 @@ package pt.upskill.iet.auctionhouse.Services.Implementation.ConsumeAPI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
+import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Retrofit.AuctionHouseService;
 
 import java.util.List;
@@ -19,5 +21,10 @@ public class ConsumeDotNetApiService {
     @GetMapping("/available-items")
     public List<ItemDto> getAvailableItems() {
         return auctionHouseService.getAvailableItems();
+    }
+
+    @GetMapping("/item-by-id/{id}")
+    public ItemDto getItemById(@PathVariable long id) throws NotFoundException {
+        return auctionHouseService.getItemById(id);
     }
 }

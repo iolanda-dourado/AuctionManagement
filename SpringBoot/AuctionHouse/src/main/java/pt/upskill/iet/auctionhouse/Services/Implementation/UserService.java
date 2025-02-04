@@ -28,16 +28,22 @@ public class UserService implements UserServiceInterface {
         return UserDto.fromUserToDto(user);
     }
 
+
+    // -------- GET ALL USERS --------
     @Override
     public Page<UserDto> getAllUsers(int page, int size) {
         return this.userRepository.findAll(PageRequest.of(page, size)).map(UserDto::fromUserToDto);
     }
 
+
+    // -------- GET USER BY ID --------
     @Override
     public UserDto getUserById(long id) {
         return this.userRepository.findById(id).map(UserDto::fromUserToDto).orElse(null);
     }
 
+
+    // -------- UPDATE USER --------
     @Override
     public UserDto updateUser(long id, UserDto userDto) {
         Optional<User> optionalUser = this.userRepository.findById(id);
@@ -56,6 +62,7 @@ public class UserService implements UserServiceInterface {
     }
 
 
+    // -------- DELETE USER --------
     @Override
     public UserDto deleteUser(long id) {
         Optional<User> optionalUser = this.userRepository.findById(id);

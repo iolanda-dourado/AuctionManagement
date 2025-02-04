@@ -1,0 +1,4 @@
+package pt.upskill.iet.auctionhouse.Repositories;
+
+public interface ItemRepository {
+}

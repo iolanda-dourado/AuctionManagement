@@ -106,6 +106,6 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+        return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
     }
 }
