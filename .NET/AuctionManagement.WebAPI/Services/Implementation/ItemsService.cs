@@ -5,6 +5,7 @@ using AuctionManagement.WebAPI.Models;
 using AuctionManagement.WebAPI.Services.Interfaces;
 using AuctionManagement.WebAPI.Validators;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuctionManagement.WebAPI.Services.Implementation {
 
@@ -182,8 +183,11 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// </summary>
         /// <returns>A list of unsold items as DTOs.</returns>
         public List<ItemDTO> GetItemsNotSold() {
-            List<Item> filteredItems = context.Items.
-                Where(i => i.Status == Enums.Status.Available).ToList();
+            List<Item> filteredItems = context.Items
+                .Include(i => i.Category) // Carrega a entidade relacionada Category
+                .Where(i => i.Status == Enums.Status.Available)
+                .ToList();
+
             itemsValidator.ValidateFilteredList(filteredItems);
 
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);

@@ -56,6 +56,12 @@ namespace AuctionManagement.WebAPI.Dtos {
 
 
         /// <summary>
+        /// Category description for exibition only
+        /// </summary>
+        public string CategoryName => Category?.Description ?? "Category not available.";
+
+
+        /// <summary>
         /// Item constructor
         /// </summary>
         /// <param name="id"></param>

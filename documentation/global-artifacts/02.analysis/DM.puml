@@ -37,25 +37,41 @@ class Sale {
 
 class AuctionBid {
     id
-    date
-    clientId
-    saleId
-    finalPrice
+    itemId
+    userId
+    auctionId
+    price
 }
 
-class Client {
+class AuctionItem {
+    itemId
+    price
+    status
+}
+
+class AuctionUser {
     id
     name
     nif
-    email
-    phone
+    bidsList
+}
+
+class Auction {
+    id
+    itemId
+    initialDate
+    finalDate
+    bidsList
+    finalPrice
 }
 
 Item "*" --- "1" Category: cataloged as >
-Item "1" --- "1" Sale: is in >
-Status "1" --- "1..*" Item : has <
-Client "1" -- "0..*" AuctionBid : has >
-AuctionBid "1" --- "1" Sale: includes >
+Item "1" ---- "1" Sale: is in >
+Item "1" -- "1.*" Status : has >
+AuctionUser "1" -- "1.*" AuctionBid : has >
+AuctionBid "1" --- "1" Sale: generates >
+AuctionBid "1" --- "1" AuctionItem: has >
+Auction "1" --- "1.*" AuctionBid: has >
 
 
 @enduml

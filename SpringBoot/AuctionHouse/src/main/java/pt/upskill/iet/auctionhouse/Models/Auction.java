@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,7 +25,8 @@ public class Auction {
 
     private double finalPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "bid_id")
-    private Bid bid;
+    private boolean active;
+
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<AuctionBid> bids; // Um leilão pode ter vários lances
 }
