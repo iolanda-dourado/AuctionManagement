@@ -4,11 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import pt.upskill.iet.auctionhouse.Dtos.UserCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.UserDto;
+import pt.upskill.iet.auctionhouse.Models.Bid;
 import pt.upskill.iet.auctionhouse.Models.User;
 import pt.upskill.iet.auctionhouse.Repositories.UserRepository;
 import pt.upskill.iet.auctionhouse.Services.Interfaces.UserServiceInterface;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,8 +24,9 @@ public class UserService implements UserServiceInterface {
 
     // -------- ADD USER --------
     @Override
-    public UserDto addUser(UserDto userDto) {
-        User user = new User(userDto.getName(), userDto.getNif(), userDto.getBids());
+    public UserDto addUser(UserCreateDto userCreateDto) {
+        List<Bid> bids = new ArrayList<>();
+        User user = new User(userCreateDto.getName(), userCreateDto.getNif(), bids);
 
         user = this.userRepository.save(user);
 

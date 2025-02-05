@@ -7,6 +7,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
@@ -30,9 +31,9 @@ public class BidController {
     // -------- ADD BID --------
     // http://localhost:8080/api/v1/bid/add-bid
     @PostMapping("add-bid")
-    public ResponseEntity<BidDto> addBid(@RequestBody BidDto bidDto) {
+    public ResponseEntity<BidDto> addBid(@RequestBody BidCreateDto bidCreateDto) {
         try {
-            BidDto bid = this.bidService.addBid(bidDto);
+            BidDto bid = this.bidService.addBid(bidCreateDto);
 
             bid.add(linkTo(methodOn(BidController.class).getBids(Optional.of(1), Optional.of(10))).withRel("bids"));
 
@@ -69,6 +70,7 @@ public class BidController {
         }
         return CollectionModel.of(bidsDto, links);
     }
+
 
     // -------- GET BID BY ID --------
     // http://localhost:8080/api/v1/bid/get-bid/1

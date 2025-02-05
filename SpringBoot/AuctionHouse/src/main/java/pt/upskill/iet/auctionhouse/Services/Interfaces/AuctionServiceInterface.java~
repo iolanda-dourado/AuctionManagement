@@ -1,14 +1,13 @@
 package pt.upskill.iet.auctionhouse.Services.Interfaces;
 
 import org.springframework.data.domain.Page;
-import pt.upskill.iet.auctionhouse.Dtos.AuctionCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 
 public interface AuctionServiceInterface {
 
-    AuctionDto addAuction(AuctionCreateDto auctionDto) throws Exception;
+    AuctionDto addAuction(AuctionDto auctionDto) throws Exception;
 
     Page<AuctionDto> getAllAuctions(int page, int size);
 

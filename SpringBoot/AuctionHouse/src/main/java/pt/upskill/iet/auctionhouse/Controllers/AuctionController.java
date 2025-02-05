@@ -7,6 +7,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.upskill.iet.auctionhouse.Dtos.AuctionCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
@@ -32,10 +33,10 @@ public class AuctionController {
     // -------- ADD AUCTION --------
     // http://localhost:8080/api/v1/auction/add-auction
     @PostMapping("add-auction")
-    public ResponseEntity<AuctionDto> addAuction(@RequestBody AuctionDto auctionDto) {
+    public ResponseEntity<AuctionDto> addAuction(@RequestBody AuctionCreateDto auctionCreateDto) {
         try {
             // Chama o serviço para adicionar o leilão
-            AuctionDto createdAuction = this.auctionService.addAuction(auctionDto);
+            AuctionDto createdAuction = this.auctionService.addAuction(auctionCreateDto);
 
             // Adiciona links HATEOAS
             createdAuction.add(linkTo(methodOn(AuctionController.class).getAuctionById(createdAuction.getId())).withSelfRel());

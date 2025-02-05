@@ -1,5 +1,7 @@
 package pt.upskill.iet.auctionhouse.Retrofit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Service;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
@@ -28,10 +30,16 @@ public class AuctionHouseService {
     public AuctionHouseService() {
         OkHttpClient unsafeHttpClient = createUnsafeOkHttpClient();
 
+        // Configura o Gson com o deserializer personalizado
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StatusDto.class, new StatusDtoDeserializer())
+                .registerTypeAdapter(StatusDto.class, new StatusDtoSerializer()) // Adiciona o serializer
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
-                .client(unsafeHttpClient) // Usa cliente com SSL desabilitado
-                .addConverterFactory(GsonConverterFactory.create())
+                .client(unsafeHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson)) // Usa o Gson configurado
                 .build();
 
         this.auctionHouseAPI = retrofit.create(AuctionHouseAPI.class);
@@ -67,18 +75,18 @@ public class AuctionHouseService {
     }
 
 
-    public StatusDto updateItemStatus(long id, StatusDto status) throws NotFoundException {
-        try {
-            Response<StatusDto> response = auctionHouseAPI.updateItemStatus(id, status).execute();
-            if (response.isSuccessful()) {
-                return response.body();
-            } else {
-                // Lançar exceção específica para item não encontrado
-                throw new NotFoundException("Item não encontrado com ID: " + id);
+    public void updateItemStatus(long id, StatusDto status) throws NotFoundException {
+        {
+            try {
+                int statusCode = status.ordinal();
+                Response<Void> response = auctionHouseAPI.updateItemStatus(id, statusCode).execute();
+
+                if (!response.isSuccessful()) {
+                    throw new NotFoundException("Item não encontrado com ID: " + id);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao atualizar status: " + e.getMessage());
             }
-        } catch (IOException e) {
-            // Capturar exceções de rede ou I/O
-            throw new RuntimeException("Erro ao buscar item: " + e.getMessage());
         }
     }
 

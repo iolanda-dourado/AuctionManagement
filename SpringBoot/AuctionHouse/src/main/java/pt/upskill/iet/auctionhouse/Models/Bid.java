@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,9 +15,12 @@ public class Bid {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-//
-//    private long itemId;
+
+    private long itemId;
+
     private double price;
+
+    private LocalDate bidDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -26,9 +31,4 @@ public class Bid {
     @JsonIgnore
     private Auction auction;
 
-    public Bid(double price, User user, Auction auction) {
-        this.price = price;
-        this.user = user;
-        this.auction = auction;
-    }
 }

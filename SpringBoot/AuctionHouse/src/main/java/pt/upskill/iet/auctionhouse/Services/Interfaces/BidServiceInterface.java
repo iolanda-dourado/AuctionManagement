@@ -1,11 +1,12 @@
 package pt.upskill.iet.auctionhouse.Services.Interfaces;
 
 import org.springframework.data.domain.Page;
+import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
 
 public interface BidServiceInterface {
 
-    BidDto addBid(BidDto BidDto) throws Exception;
+    BidDto addBid(BidCreateDto bidCreateDto) throws Exception;
 
     Page<BidDto> getAllBids(int page, int size);
 

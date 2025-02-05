@@ -29,12 +29,6 @@ public class User {
     @JsonIgnore
     private List<Bid> bids = new ArrayList<>(); // Relacionamento correto
 
-    public User(String name, String nif) {
-        this.name = name;
-        this.nif = nif;
-        this.bids = new ArrayList<>();
-    }
-
     public User(String name, String nif, List<Bid> bids) {
         this.name = name;
         this.nif = nif;

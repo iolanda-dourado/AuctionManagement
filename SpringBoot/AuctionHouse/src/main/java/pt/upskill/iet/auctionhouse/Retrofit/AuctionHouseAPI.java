@@ -18,5 +18,8 @@ public interface AuctionHouseAPI {
     Call<ItemDto> getItemById(@Path("id") long id);
 
     @PATCH("Items/update-item-status/itemid/{id}/status/{status}")
-    Call<StatusDto> updateItemStatus(@Path("id") long id, @Path("status") StatusDto status);
+    Call<Void> updateItemStatus( // Altere para Void
+                                 @Path("id") long id,
+                                 @Path("status") int status
+    );
 }

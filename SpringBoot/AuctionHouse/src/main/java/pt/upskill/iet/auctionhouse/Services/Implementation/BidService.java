@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
@@ -34,17 +35,17 @@ public class BidService implements BidServiceInterface {
 
     // -------- ADD BID --------
     @Override
-    public BidDto addBid(BidDto bidDto) throws Exception {
+    public BidDto addBid(BidCreateDto bidCreateDto) throws Exception {
         // Buscar o leilão pelo ID
-        Auction auction = auctionRepository.findById(bidDto.getAuctionId())
-                .orElseThrow(() -> new NotFoundException("Auction not found"));
+        Auction auction = auctionRepository.findById(bidCreateDto.getAuctionId()).orElseThrow(() -> new NotFoundException("Auction not found"));
 
         // Buscar o utilizador que fez o lance
-        User user = userRepository.findById(bidDto.getUserId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        User user = userRepository.findById(bidCreateDto.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
+
 
         // Buscar os detalhes do item associado ao leilão
-        ItemDto itemDto = auctionHouseService.getItemById(auction.getItemId());
+        long itemId = auction.getItemId();
+        ItemDto itemDto = auctionHouseService.getItemById(itemId);
 
         if (itemDto == null) {
             throw new NotFoundException("Item not found in external API");
@@ -52,9 +53,10 @@ public class BidService implements BidServiceInterface {
 
         // Criar o Bid e associá-lo ao leilão e ao utilizador
         Bid bid = new Bid();
+        bid.setItemId(auction.getItemId());
         bid.setAuction(auction);
         bid.setUser(user);
-        bid.setPrice(bidDto.getPrice());
+        bid.setPrice(bidCreateDto.getPrice());
 
         // Adicionar o bid à lista de bids do utilizador e do leilão
         user.getBids().add(bid);

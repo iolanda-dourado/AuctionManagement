@@ -7,6 +7,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.upskill.iet.auctionhouse.Dtos.UserCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.UserDto;
 import pt.upskill.iet.auctionhouse.Services.Implementation.UserService;
 
@@ -27,8 +28,8 @@ public class UserController {
     // -------- ADD USER --------
     // http://localhost:8080/api/v1/user/add-user
     @PostMapping("add-user")
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
-        UserDto user = this.userService.addUser(userDto);
+    public ResponseEntity<UserDto> addUser(@RequestBody UserCreateDto userCreateDto) {
+        UserDto user = this.userService.addUser(userCreateDto);
 
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

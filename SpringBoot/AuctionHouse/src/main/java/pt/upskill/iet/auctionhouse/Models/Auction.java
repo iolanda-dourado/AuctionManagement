@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,21 +30,4 @@ public class Auction {
     @JsonIgnore
     private List<Bid> bids = new ArrayList<>();
 
-    public Auction(long itemId, LocalDate initialDate, LocalDate finalDate, double finalPrice, boolean active, List<Bid> bids) {
-        this.itemId = itemId;
-        this.initialDate = initialDate;
-        this.finalDate = finalDate;
-        this.finalPrice = finalPrice;
-        this.active = active;
-        this.bids = new ArrayList<>();
-    }
-
-    public Auction(long itemId, LocalDate initialDate, LocalDate finalDate, double finalPrice, boolean active) {
-        this.itemId = itemId;
-        this.initialDate = initialDate;
-        this.finalDate = finalDate;
-        this.finalPrice = finalPrice;
-        this.active = active;
-        this.bids = new ArrayList<>();
-    }
 }

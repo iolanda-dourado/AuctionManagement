@@ -1,0 +1,4 @@
+package pt.upskill.iet.auctionhouse.Dtos;
+
+public class AuctionUpdateDto {
+}
