@@ -1,4 +1,5 @@
 ﻿using AuctionManagement.WebAPI.Dtos;
+using AuctionManagement.WebAPI.Enums;
 using AuctionManagement.WebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -67,18 +68,23 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
 
 
         /// <summary>
+        /// Retrieves a list of unsold items.
+        /// </summary>
+        /// <returns>A list of unsold items.</returns>
+        public List<ItemDTO> GetItemsAvailable();
+
+
+        /// <summary>
+        /// Retrieves a list of items that are currently up for auction.
+        /// </summary>
+        /// <returns></returns>
+        public List<ItemDTO> GetItemsAtAuction();
+
+        /// <summary>
         /// Retrieves a list of sold items.
         /// </summary>
         /// <returns>A list of sold items.</returns>
         public List<ItemDTO> GetItemsSold();
-
-
-        /// <summary>
-        /// Retrieves a list of unsold items.
-        /// </summary>
-        /// <returns>A list of unsold items.</returns>
-        public List<ItemDTO> GetItemsNotSold();
-
 
         /// <summary>
         /// Retrieves a list of sold items by category.
@@ -94,5 +100,14 @@ namespace AuctionManagement.WebAPI.Services.Interfaces {
         /// <param name="categId">The ID of the category.</param>
         /// <returns>A list of unsold items in the specified category.</returns>
         public List<ItemDTO> GetItemsNotSoldByCategory(int categId);
+
+
+        /// <summary>
+        /// Updates the status of an item.
+        /// </summary>
+        /// <param name="itemId"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public Status UpdateItemStatus(int itemId, int status);
     }
 }

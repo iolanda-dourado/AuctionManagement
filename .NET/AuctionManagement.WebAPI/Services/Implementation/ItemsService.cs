@@ -164,25 +164,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
 
 
         /// <summary>
-        /// Retrieves a list of items in the auction system that have been sold.
-        /// </summary>
-        /// <returns>A list of sold items as DTOs.</returns>
-        public List<ItemDTO> GetItemsSold() {
-            List<Item> filteredItems = context.Items.
-                Where(i => i.Status == Enums.Status.Sold).ToList();
-            itemsValidator.ValidateFilteredList(filteredItems);
-
-            List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
-
-            return filteredItemsDTO;
-        }
-
-
-        /// <summary>
         /// Retrieves a list of items in the auction system that have not been sold.
         /// </summary>
         /// <returns>A list of unsold items as DTOs.</returns>
-        public List<ItemDTO> GetItemsNotSold() {
+        public List<ItemDTO> GetItemsAvailable() {
             List<Item> filteredItems = context.Items
                 .Include(i => i.Category) // Carrega a entidade relacionada Category
                 .Where(i => i.Status == Enums.Status.Available)
@@ -195,6 +180,34 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             return filteredItemsDTO;
         }
 
+
+        public List<ItemDTO> GetItemsAtAuction() {
+            List<Item> filteredItems = context.Items
+                .Include(i => i.Category)
+                .Where(i => i.Status == Enums.Status.AtAuction)
+                .ToList();
+
+            itemsValidator.ValidateFilteredList(filteredItems);
+
+            List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
+
+            return filteredItemsDTO;
+        }
+
+
+        /// <summary>
+        /// Retrieves a list of items in the auction system that have been sold.
+        /// </summary>
+        /// <returns>A list of sold items as DTOs.</returns>
+        public List<ItemDTO> GetItemsSold() {
+            List<Item> filteredItems = context.Items.
+                Where(i => i.Status == Enums.Status.Sold).ToList();
+            itemsValidator.ValidateFilteredList(filteredItems);
+
+            List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
+
+            return filteredItemsDTO;
+        }
 
 
         /// <summary>
@@ -225,6 +238,25 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
 
             return filteredItemsDTO;
+        }
+
+
+        public Status UpdateItemStatus(int itemId, int status) {
+            Item item = itemsValidator.ValidateItemExistence(itemId);
+
+            if (!Enum.IsDefined(typeof(Status), status)) {
+                throw new ArgumentException("Invalid status value.");
+            }
+
+            Status statusEnum = (Status)status;
+
+            if (item.Status != Status.Sold) {
+                item.Status = statusEnum;
+                context.SaveChanges();
+                return item.Status;
+            } else {
+                throw new InvalidOperationException("Item is already sold.");
+            }
         }
     }
 }

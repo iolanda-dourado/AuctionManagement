@@ -2,6 +2,7 @@
 using AuctionManagement.WebAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AuctionManagement.WebAPI.Enums;
 
 namespace AuctionManagement.WebAPI.Controllers {
 
@@ -18,6 +19,10 @@ namespace AuctionManagement.WebAPI.Controllers {
 
         private readonly IItemsService itemsService;
 
+        /// <summary>
+        /// The constructor for the ItemsController class.
+        /// </summary>
+        /// <param name="itemsService"></param>
         public ItemsController(IItemsService itemsService) {
             this.itemsService = itemsService;
         }
@@ -51,10 +56,8 @@ namespace AuctionManagement.WebAPI.Controllers {
         /// </summary>
         /// <returns>A list of ItemDTO objects representing the items in the database.</returns>
         /// <remarks>
-        /// This method requires authorization with the Admin role.
         /// If an error occurs while retrieving the items, a NotFound result is returned with a message describing the error.
         /// </remarks>
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<ItemDTO>> GetItems() {
             try {
@@ -183,6 +186,43 @@ namespace AuctionManagement.WebAPI.Controllers {
 
 
         /// <summary>
+        /// Retrieves a list of items that have not been sold.
+        /// </summary>
+        /// <returns>A list of ItemDTO objects representing the unsold items.</returns>
+        /// <remarks>
+        /// If an error occurs while retrieving the unsold items, a NotFound result is returned with a message describing the error.
+        /// </remarks>
+        /// <response code="200">The unsold items were successfully retrieved.</response>
+        /// <response code="404">No unsold items were found.</response>
+        [HttpGet("available-items")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsAvailable() {
+            try {
+                var itemsDTO = itemsService.GetItemsAvailable();
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Retrieves a list of items that are currently up for auction.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("at-auction-items")]
+        public ActionResult<IEnumerable<ItemDTO>> GetItemsAtAuction() {
+            try {
+                var itemsDTO = itemsService.GetItemsAtAuction();
+                return Ok(itemsDTO);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
         /// Retrieves a list of items that have been sold.
         /// </summary>
         /// <returns>A list of ItemDTO objects representing the sold items.</returns>
@@ -203,29 +243,6 @@ namespace AuctionManagement.WebAPI.Controllers {
                 return NotFound(new { message = ex.Message });
             }
         }
-
-
-        /// <summary>
-        /// Retrieves a list of items that have not been sold.
-        /// </summary>
-        /// <returns>A list of ItemDTO objects representing the unsold items.</returns>
-        /// <remarks>
-        /// If an error occurs while retrieving the unsold items, a NotFound result is returned with a message describing the error.
-        /// </remarks>
-        /// <response code="200">The unsold items were successfully retrieved.</response>
-        /// <response code="404">No unsold items were found.</response>
-        [HttpGet("available-items")]
-        public ActionResult<IEnumerable<ItemDTO>> GetItemsNotSold() {
-            try {
-                var itemsDTO = itemsService.GetItemsNotSold();
-                return Ok(itemsDTO);
-            }
-            catch (InvalidOperationException ex) {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-
         /// <summary>
         /// Method to get all items sold by a specific category.
         /// </summary>
@@ -264,6 +281,27 @@ namespace AuctionManagement.WebAPI.Controllers {
             }
             catch (InvalidOperationException ex) {
                 return NotFound(new { message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Method to update the status of an item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        [HttpPatch("update-item-status/itemid/{id}/status/{status}")]
+        public ActionResult<IEnumerable<Status>> UpdateItemStatus(int id, int status) {  // Mudança aqui para "int"
+            try {
+                itemsService.UpdateItemStatus(id, status);
+                return Ok(new { message = "Status updated successfully." });
+            }
+            catch (InvalidOperationException ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex) {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

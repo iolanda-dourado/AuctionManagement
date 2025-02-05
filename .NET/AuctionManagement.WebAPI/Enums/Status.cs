@@ -5,6 +5,7 @@
     /// </summary>
     public enum Status {
         Available,
+        AtAuction,
         Sold
     }
 }

@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
-import pt.upskill.iet.auctionhouse.Models.AuctionBid;
+import pt.upskill.iet.auctionhouse.Models.Bid;
 import pt.upskill.iet.auctionhouse.Models.User;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,9 +20,7 @@ public class UserDto extends RepresentationModel<UserDto> {
     private long id;
     private String name;
     private String nif;
-
-    @JsonIgnore
-    private AuctionBid bids;
+    private List<Bid> bids;
 
     // Método que converte de User para DTO
     public static UserDto fromUserToDto(User user) {

@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
+import pt.upskill.iet.auctionhouse.Dtos.StatusDto;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Models.Auction;
@@ -28,34 +30,38 @@ public class AuctionService implements AuctionServiceInterface {
     // -------- ADD AUCTION --------
     @Override
     public AuctionDto addAuction(AuctionDto auctionDto) throws Exception {
-        // Log para verificar os dados recebidos
-        System.out.println("Dados do leilão: " + auctionDto);
-        Auction auction = new Auction(
-                auctionDto.getItemId(),
-                auctionDto.getInitialDate(),
-                auctionDto.getFinalDate(),
-                auctionDto.getFinalPrice(),
-                auctionDto.isActive(),
-                auctionDto.getBids()
-        );
-
-        if (auctionDto.getFinalDate().before(auctionDto.getInitialDate())) {
+        // Validação de data
+        if (auctionDto.getFinalDate().isBefore(auctionDto.getInitialDate())) {
             throw new InvalidDateException("The final date must be greater than the initial date");
         }
 
         ItemDto itemDto = this.auctionHouseService.getItemById(auctionDto.getItemId());
-
         // Verifica se o item não foi encontrado
         if (itemDto == null) {
             throw new NotFoundException("Item not found");
         }
-
+        // Validação de preço
         if (auctionDto.getFinalPrice() < itemDto.getPrice()) {
-            throw new InvalidPriceException("The final price must be greater than the item price");
+            throw new InvalidPriceException("The final price must be greater than the item's price");
         }
+        if (itemDto.getStatus() == StatusDto.Sold) {
+            throw new InvalidOperationException("The item is already sold, therefore it cannot be auctioned.");
+        }
+        auctionHouseService.updateItemStatus(itemDto.getId(), StatusDto.AtAuction);
 
+
+        // Criando a entidade Auction
+        Auction auction = new Auction();
+        auction.setItemId(auctionDto.getItemId());
+        auction.setInitialDate(auctionDto.getInitialDate());
+        auction.setFinalDate(auctionDto.getFinalDate());
+        auction.setFinalPrice(auctionDto.getFinalPrice());
+        auction.setActive(auctionDto.isActive());
+
+        // Salvando no repositório
         auction = this.auctionRepository.save(auction);
 
+        // Convertendo para DTO e retornando
         return AuctionDto.fromAuctionToDto(auction);
     }
 
@@ -87,7 +93,7 @@ public class AuctionService implements AuctionServiceInterface {
             throw new NotFoundException("Auction not found");
         }
 
-        if (auctionDto.getFinalDate().before(auctionDto.getInitialDate())) {
+        if (auctionDto.getFinalDate().isBefore(auctionDto.getInitialDate())) {
             throw new InvalidDateException("The final date must be greater than the initial date");
         }
 
@@ -111,6 +117,16 @@ public class AuctionService implements AuctionServiceInterface {
 
         if (optionalAuction.isEmpty()) {
             throw new NotFoundException("Auction not found");
+        }
+
+        ItemDto itemDto = this.auctionHouseService.getItemById(optionalAuction.get().getItemId());
+        // Faz update ao estado do item para Available
+        if (itemDto.getStatus() != StatusDto.Sold) {
+            auctionHouseService.updateItemStatus(itemDto.getId(), StatusDto.Available);
+
+        // Caso o item tenha sido vendido, lançar exceção para impedir que o leilão seja eliminado
+        } else {
+            throw new InvalidOperationException("The item is already sold, therefore the Auction cannot be deleted.");
         }
 
         this.auctionRepository.deleteById(id);

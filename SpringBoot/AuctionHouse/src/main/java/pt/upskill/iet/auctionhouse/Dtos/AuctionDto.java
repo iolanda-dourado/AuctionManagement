@@ -6,8 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 import pt.upskill.iet.auctionhouse.Models.Auction;
-import pt.upskill.iet.auctionhouse.Models.AuctionBid;
+import pt.upskill.iet.auctionhouse.Models.Bid;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -20,15 +22,15 @@ public class AuctionDto extends RepresentationModel<AuctionDto> {
 
     private long itemId;
 
-    private Date initialDate;
+    private LocalDate initialDate;
 
-    private Date finalDate;
+    private LocalDate finalDate;
 
     private double finalPrice;
 
     private boolean active;
 
-    private List<AuctionBid> bids;
+    private List<Bid> bids;
 
     // Método que converte de User para DTO
     public static AuctionDto fromAuctionToDto(Auction auction) {

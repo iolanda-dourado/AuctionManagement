@@ -10,11 +10,11 @@ public class ItemDto {
     private long id;
     private String name;
     private double price;
-    private int status;
+    private StatusDto status;
     private long categoryId;
     private String categoryName;
 
-    public ItemDto(long id, String name, double price, int status, long categoryId, String categoryName) {
+    public ItemDto(long id, String name, double price, StatusDto status, long categoryId, String categoryName) {
         this.id = id;
         this.name = name;
         this.price = price;

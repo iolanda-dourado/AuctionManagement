@@ -1,9 +1,12 @@
 package pt.upskill.iet.auctionhouse.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,23 +22,30 @@ public class Auction {
     @Column(nullable = false)
     private long itemId;
 
-    private Date initialDate;
-
-    private Date finalDate;
-
+    private LocalDate initialDate;
+    private LocalDate finalDate;
     private double finalPrice;
-
     private boolean active;
 
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<AuctionBid> bids; // Um leilão pode ter vários lances
+    @JsonIgnore
+    private List<Bid> bids = new ArrayList<>();
 
-    public Auction(long itemId, Date initialDate, Date finalDate, double finalPrice, boolean active, List<AuctionBid> bids) {
+    public Auction(long itemId, LocalDate initialDate, LocalDate finalDate, double finalPrice, boolean active, List<Bid> bids) {
         this.itemId = itemId;
         this.initialDate = initialDate;
         this.finalDate = finalDate;
         this.finalPrice = finalPrice;
         this.active = active;
-        this.bids = bids;
+        this.bids = new ArrayList<>();
+    }
+
+    public Auction(long itemId, LocalDate initialDate, LocalDate finalDate, double finalPrice, boolean active) {
+        this.itemId = itemId;
+        this.initialDate = initialDate;
+        this.finalDate = finalDate;
+        this.finalPrice = finalPrice;
+        this.active = active;
+        this.bids = new ArrayList<>();
     }
 }

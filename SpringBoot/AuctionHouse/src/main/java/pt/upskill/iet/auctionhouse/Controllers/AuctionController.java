@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Services.Implementation.AuctionService;
@@ -33,24 +34,25 @@ public class AuctionController {
     @PostMapping("add-auction")
     public ResponseEntity<AuctionDto> addAuction(@RequestBody AuctionDto auctionDto) {
         try {
-            AuctionDto auction = this.auctionService.addAuction(auctionDto);
+            // Chama o serviço para adicionar o leilão
+            AuctionDto createdAuction = this.auctionService.addAuction(auctionDto);
 
-            auction.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(1), Optional.of(10))).withRel("auctions"));
+            // Adiciona links HATEOAS
+            createdAuction.add(linkTo(methodOn(AuctionController.class).getAuctionById(createdAuction.getId())).withSelfRel());
+            createdAuction.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(1), Optional.of(10))).withRel("Auctions"));
 
-            return new ResponseEntity<AuctionDto>(auction, HttpStatus.OK);
+            // Retorna a resposta com o status CREATED
+            return new ResponseEntity<>(createdAuction, HttpStatus.CREATED);
         } catch (InvalidDateException | InvalidPriceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (RuntimeException e) {
-            // Logar o erro para depuração
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            e.printStackTrace();
+            // Retorna um erro genérico em caso de falha
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     // -------- GET AUCTIONS --------
@@ -122,7 +124,9 @@ public class AuctionController {
             return new ResponseEntity<>(deletedAuction, HttpStatus.NO_CONTENT);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
+        } catch (InvalidOperationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
