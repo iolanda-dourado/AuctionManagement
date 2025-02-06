@@ -1,13 +1,16 @@
 package pt.upskill.iet.auctionhouse.Dtos;
 
-import pt.upskill.iet.auctionhouse.Models.Bid;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class AuctionUpdateDto {
     private long id;
-
-    private long itemId;
 
     private LocalDate initialDate;
 

@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import pt.upskill.iet.auctionhouse.Dtos.AuctionCreateDto;
-import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
-import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
-import pt.upskill.iet.auctionhouse.Dtos.StatusDto;
+import pt.upskill.iet.auctionhouse.Dtos.*;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
@@ -84,23 +81,30 @@ public class AuctionService implements AuctionServiceInterface {
 
     // -------- UPDATE AUCTION --------
     @Override
-    public AuctionDto updateAuction(long id, AuctionDto auctionDto) throws Exception {
+    public AuctionDto updateAuction(long id, AuctionUpdateDto auctionUpdateDto) throws Exception {
         Optional<Auction> optionalAuction = this.auctionRepository.findById(id);
 
         if (optionalAuction.isEmpty()) {
             throw new NotFoundException("Auction not found");
         }
 
-        if (auctionDto.getFinalDate().isBefore(auctionDto.getInitialDate())) {
+        if (auctionUpdateDto.getFinalDate().isBefore(auctionUpdateDto.getInitialDate())) {
             throw new InvalidDateException("The final date must be greater than the initial date");
         }
 
+        // Se o status do item for Sold, não permite atualizar
+        ItemDto itemDto = auctionHouseService.getItemById(optionalAuction.get().getItemId());
+        if (itemDto.getStatus() == StatusDto.Sold) {
+            throw new InvalidOperationException("The item is already sold, therefore the auction cannot be updated.");
+        }
+
+        // Na atualização só deixa atualizar as datas e o estado
         Auction auction = optionalAuction.get();
-        auction.setItemId(auctionDto.getItemId());
-        auction.setInitialDate(auctionDto.getInitialDate());
-        auction.setFinalDate(auctionDto.getFinalDate());
-        auction.setFinalPrice(auctionDto.getFinalPrice());
-        auction.setActive(auctionDto.isActive());
+        auction.setItemId(optionalAuction.get().getItemId());
+        auction.setInitialDate(auctionUpdateDto.getInitialDate());
+        auction.setFinalDate(auctionUpdateDto.getFinalDate());
+        auction.setFinalPrice(optionalAuction.get().getFinalPrice());
+        auction.setActive(auctionUpdateDto.isActive());
 
         auction = this.auctionRepository.save(auction);
 
@@ -118,13 +122,33 @@ public class AuctionService implements AuctionServiceInterface {
         }
 
         ItemDto itemDto = this.auctionHouseService.getItemById(optionalAuction.get().getItemId());
-
+        // Não deixa deletar se o item tiver status Sold
         if (itemDto.getStatus() == StatusDto.Sold) {
-            throw new InvalidOperationException("The item is already sold, therefore it cannot be auctioned.");
+            throw new InvalidOperationException("The item is already sold, therefore the auction cannot be deleted.");
         }
-        auctionHouseService.updateItemStatus(itemDto.getId(), StatusDto.AtAuction);
+
+        // Não deixar deletar se o leilão já tiver licitações
+        if (!optionalAuction.get().getBids().isEmpty()) {
+            throw new InvalidOperationException("The auction has bids already, therefore it cannot be deleted.");
+        }
+
+        // Atualiza o status do Item para Available antes de deletar
+        auctionHouseService.updateItemStatus(itemDto.getId(), StatusDto.Available);
 
         this.auctionRepository.deleteById(id);
         return AuctionDto.fromAuctionToDto(optionalAuction.get());
+    }
+
+
+    public AuctionDto updateAuctionStatus(long id, boolean isActive) throws Exception {
+        Optional<Auction> optionalAuction = this.auctionRepository.findById(id);
+        if (optionalAuction.isEmpty()) {
+            throw new NotFoundException("Auction not found");
+        }
+
+        Auction auction = optionalAuction.get();
+        auction.setActive(isActive);
+        auction = this.auctionRepository.save(auction);
+        return AuctionDto.fromAuctionToDto(auction);
     }
 }

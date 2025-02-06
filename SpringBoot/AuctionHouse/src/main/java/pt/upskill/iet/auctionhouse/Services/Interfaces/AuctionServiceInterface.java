@@ -3,6 +3,7 @@ package pt.upskill.iet.auctionhouse.Services.Interfaces;
 import org.springframework.data.domain.Page;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
+import pt.upskill.iet.auctionhouse.Dtos.AuctionUpdateDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 
@@ -14,7 +15,7 @@ public interface AuctionServiceInterface {
 
     AuctionDto getAuctionById(long id) throws Exception;
 
-    AuctionDto updateAuction (long id, AuctionDto auctionDto) throws Exception;
+    AuctionDto updateAuction (long id, AuctionUpdateDto auctionUpdateDto) throws Exception;
 
     AuctionDto deleteAuction (long id) throws Exception;
 }

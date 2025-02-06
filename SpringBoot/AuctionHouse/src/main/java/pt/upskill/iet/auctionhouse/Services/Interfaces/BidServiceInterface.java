@@ -12,7 +12,7 @@ public interface BidServiceInterface {
 
     BidDto getBidById(long id) throws Exception;
 
-    BidDto updateBid (long id, BidDto BidDto) throws Exception;
+//    BidDto updateBid (long id, BidDto BidDto) throws Exception;
 
     BidDto deleteBid (long id) throws Exception;
 }

@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface AuctionHouseAPI {
 
+    @GET("Items")
+    Call<List<ItemDto>> getItems();
+
     @GET("Items/available-items")
     Call<List<ItemDto>> getAvailableItems();
 

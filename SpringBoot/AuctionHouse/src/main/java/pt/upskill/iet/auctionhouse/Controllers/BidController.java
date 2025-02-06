@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Services.Implementation.BidService;
@@ -38,7 +39,7 @@ public class BidController {
             bid.add(linkTo(methodOn(BidController.class).getBids(Optional.of(1), Optional.of(10))).withRel("bids"));
 
             return new ResponseEntity<>(bid, HttpStatus.CREATED); // Use HttpStatus.CREATED para a criação
-        } catch (InvalidDateException | InvalidPriceException e) {
+        } catch (InvalidPriceException | InvalidOperationException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -89,20 +90,22 @@ public class BidController {
         }
     }
 
+
     // -------- UPDATE BID --------
     // http://localhost:8080/api/v1/bid/update-bid/1
-    @PutMapping("update-bid/{id}")
-    public ResponseEntity<BidDto> updateBid(@PathVariable long id, @RequestBody BidDto bidDto) {
-        try {
-            BidDto updatedBid = this.bidService.updateBid(id, bidDto);
-            updatedBid.add(linkTo(methodOn(BidController.class).getBids(Optional.of(1), Optional.of(10))).withRel("bids"));
-            return new ResponseEntity<>(updatedBid, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PutMapping("update-bid/{id}")
+//    public ResponseEntity<BidDto> updateBid(@PathVariable long id, @RequestBody BidDto bidDto) {
+//        try {
+//            BidDto updatedBid = this.bidService.updateBid(id, bidDto);
+//            updatedBid.add(linkTo(methodOn(BidController.class).getBids(Optional.of(1), Optional.of(10))).withRel("bids"));
+//            return new ResponseEntity<>(updatedBid, HttpStatus.OK);
+//        } catch (NotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
 
     // -------- DELETE BID --------
     // http://localhost:8080/api/v1/bid/delete-bid/1
@@ -113,6 +116,8 @@ public class BidController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Retorna NO_CONTENT sem o corpo
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (InvalidOperationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

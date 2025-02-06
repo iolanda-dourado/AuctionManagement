@@ -46,6 +46,20 @@ public class AuctionHouseService {
     }
 
 
+    public List<ItemDto> getItems() {
+        try {
+            Response<List<ItemDto>> response = auctionHouseAPI.getItems().execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error fetching items: " + e.getMessage());
+        }
+
+        return Collections.emptyList();
+    }
+
+
     public List<ItemDto> getAvailableItems() {
         try {
             Response<List<ItemDto>> response = auctionHouseAPI.getAvailableItems().execute();

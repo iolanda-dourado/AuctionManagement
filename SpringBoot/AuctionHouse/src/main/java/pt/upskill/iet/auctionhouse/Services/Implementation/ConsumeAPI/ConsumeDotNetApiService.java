@@ -17,6 +17,11 @@ public class ConsumeDotNetApiService {
     @Autowired
     AuctionHouseService auctionHouseService;
 
+    @GetMapping("items")
+    public List<ItemDto> getItems() {
+        return auctionHouseService.getItems();
+    }
+
     @GetMapping("/available-items")
     public List<ItemDto> getAvailableItems() {
         return auctionHouseService.getAvailableItems();

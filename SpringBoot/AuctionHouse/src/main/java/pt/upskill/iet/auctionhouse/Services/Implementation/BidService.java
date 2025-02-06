@@ -8,6 +8,7 @@ import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Models.Auction;
 import pt.upskill.iet.auctionhouse.Models.Bid;
@@ -47,8 +48,15 @@ public class BidService implements BidServiceInterface {
         long itemId = auction.getItemId();
         ItemDto itemDto = auctionHouseService.getItemById(itemId);
 
+        // Verificar se o item existe do lado do .NET, se o leilão está ativo e se o valor da licitação é maior que o valor base do item
         if (itemDto == null) {
             throw new NotFoundException("Item not found in external API");
+        }
+        if (!auction.isActive()) {
+            throw new InvalidOperationException("Auction is not active, you can't bid on it");
+        }
+        if (bidCreateDto.getPrice() < itemDto.getPrice()) {
+            throw new InvalidPriceException("Bid price must be greater than the base price of the item");
         }
 
         // Criar o Bid e associá-lo ao leilão e ao utilizador
@@ -85,34 +93,34 @@ public class BidService implements BidServiceInterface {
 
 
     // -------- UPDATE BID --------
-    @Override
-    public BidDto updateBid(long id, BidDto bidDto) throws Exception {
-        Optional<Bid> optionalBid = this.bidRepository.findById(id);
-        Optional<User> user = userRepository.findById(bidDto.getUserId());
-        Optional<Auction> auction = auctionRepository.findById(bidDto.getAuctionId());
-        if (auction.isEmpty()) {
-            throw new NotFoundException("Auction not found");
-        }
-
-        Optional<ItemDto> itemDto = Optional.ofNullable(auctionHouseService.getItemById(auction.get().getItemId()));
-        if (optionalBid.isEmpty()) {
-            throw new InvalidOperationException("Bid not found");
-        }
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found");
-        }
-        if (itemDto.isEmpty()) {
-            throw new NotFoundException("User not found");
-        }
-
-        Bid bid = bidDto.fromDtoToBid(auctionRepository, userRepository);
-        bid.setUser(user.get());
-        bid.setPrice(bidDto.getPrice());
-        bid.setAuction(bid.getAuction());
-        bid = this.bidRepository.save(bid);
-
-        return BidDto.fromBidToDto(bid);
-    }
+//    @Override
+//    public BidDto updateBid(long id, BidDto bidDto) throws Exception {
+//        Optional<Bid> optionalBid = this.bidRepository.findById(id);
+//        Optional<User> user = userRepository.findById(bidDto.getUserId());
+//        Optional<Auction> auction = auctionRepository.findById(bidDto.getAuctionId());
+//        if (auction.isEmpty()) {
+//            throw new NotFoundException("Auction not found");
+//        }
+//
+//        Optional<ItemDto> itemDto = Optional.ofNullable(auctionHouseService.getItemById(auction.get().getItemId()));
+//        if (optionalBid.isEmpty()) {
+//            throw new InvalidOperationException("Bid not found");
+//        }
+//        if (user.isEmpty()) {
+//            throw new NotFoundException("User not found");
+//        }
+//        if (itemDto.isEmpty()) {
+//            throw new NotFoundException("User not found");
+//        }
+//
+//        Bid bid = bidDto.fromDtoToBid(auctionRepository, userRepository);
+//        bid.setUser(user.get());
+//        bid.setPrice(bidDto.getPrice());
+//        bid.setAuction(bid.getAuction());
+//        bid = this.bidRepository.save(bid);
+//
+//        return BidDto.fromBidToDto(bid);
+//    }
 
 
     // -------- DELETE BID --------
@@ -122,6 +130,13 @@ public class BidService implements BidServiceInterface {
 
         if (optionalBid.isEmpty()) {
             throw new NotFoundException("Bid not found");
+        }
+
+        Optional<Auction> auction = this.auctionRepository.findById(optionalBid.get().getAuction().getId());
+
+        // Não permite deletar a licitação se o leilão estiver encerrado
+        if (!auction.get().isActive()) {
+            throw new InvalidOperationException("Auction is not active, you can't delete this bid.");
         }
 
         this.bidRepository.deleteById(id);
