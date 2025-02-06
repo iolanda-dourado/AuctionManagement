@@ -1,18 +1,21 @@
-package pt.upskill.iet.auctionhouse.Services.Implementation.ConsumeAPI;
+package pt.upskill.iet.auctionhouse.Retrofit.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
+import pt.upskill.iet.auctionhouse.Dtos.SaleDto;
 import pt.upskill.iet.auctionhouse.Dtos.StatusDto;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
-import pt.upskill.iet.auctionhouse.Retrofit.AuctionHouseService;
+import pt.upskill.iet.auctionhouse.Retrofit.Service.AuctionHouseService;
+import retrofit2.Call;
+import retrofit2.http.POST;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/auction/")
-public class ConsumeDotNetApiService {
+public class AuctionHouseApiController {
 
     @Autowired
     AuctionHouseService auctionHouseService;
@@ -39,11 +42,16 @@ public class ConsumeDotNetApiService {
     ) {
         try {
             auctionHouseService.updateItemStatus(id, status);
-            return ResponseEntity.ok().build(); // Retorna 200 OK sem corpo
+            return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build(); // Retorna 404 Not Found
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build(); // Retorna 500
+            return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PostMapping("/add-sale")
+    public SaleDto addSale(@RequestBody SaleDto saleDto) {
+        return auctionHouseService.addSale(saleDto.getPrice(), saleDto.getItemId());
     }
 }

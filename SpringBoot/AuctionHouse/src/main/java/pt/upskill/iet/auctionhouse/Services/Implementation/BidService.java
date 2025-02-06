@@ -16,9 +16,10 @@ import pt.upskill.iet.auctionhouse.Models.User;
 import pt.upskill.iet.auctionhouse.Repositories.AuctionRepository;
 import pt.upskill.iet.auctionhouse.Repositories.BidRepository;
 import pt.upskill.iet.auctionhouse.Repositories.UserRepository;
-import pt.upskill.iet.auctionhouse.Retrofit.AuctionHouseService;
+import pt.upskill.iet.auctionhouse.Retrofit.Service.AuctionHouseService;
 import pt.upskill.iet.auctionhouse.Services.Interfaces.BidServiceInterface;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -65,6 +66,7 @@ public class BidService implements BidServiceInterface {
         bid.setAuction(auction);
         bid.setUser(user);
         bid.setPrice(bidCreateDto.getPrice());
+        bid.setBidDate(LocalDate.now());
 
         // Adicionar o bid à lista de bids do utilizador e do leilão
         user.getBids().add(bid);

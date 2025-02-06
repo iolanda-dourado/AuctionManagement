@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.UserCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.UserDto;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidNifException;
+import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
+import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
+import pt.upskill.iet.auctionhouse.Models.User;
 import pt.upskill.iet.auctionhouse.Services.Implementation.UserService;
 
 import java.util.ArrayList;
@@ -29,15 +33,18 @@ public class UserController {
     // http://localhost:8080/api/v1/user/add-user
     @PostMapping("add-user")
     public ResponseEntity<UserDto> addUser(@RequestBody UserCreateDto userCreateDto) {
-        UserDto user = this.userService.addUser(userCreateDto);
+        try {
+            UserDto userDto = this.userService.addUser(userCreateDto);
 
-        if (user == null) {
+            userDto.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("users"));
+
+            return new ResponseEntity<UserDto>(userDto, HttpStatus.CREATED);
+        } catch (InvalidOperationException | InvalidNifException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        user.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("users"));
-
-        return new ResponseEntity<UserDto>(user, HttpStatus.OK);
     }
 
 
@@ -70,30 +77,46 @@ public class UserController {
     // http://localhost:8080/api/v1/user/get-user/1
     @GetMapping("get-user/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") long id) {
-        UserDto userDto = this.userService.getUserById(id);
-        if (userDto == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        try {
+            UserDto userDto = this.userService.getUserById(id);
 
-        userDto.add(linkTo(methodOn(UserController.class).getUserById(id)).withSelfRel());
-        userDto.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("Users"));
-        return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
+            userDto.add(linkTo(methodOn(UserController.class).getUserById(id)).withSelfRel());
+            userDto.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("Users"));
+            return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     // -------- UPDATE USER --------
     // http://localhost:8080/api/ex1/user/update-user/1
-    @PutMapping("update-user/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestParam long id, @RequestBody UserDto user) {
+//    @PutMapping("update-user/{id}")
+//    public ResponseEntity<UserDto> updateUser(@RequestParam long id, @RequestBody UserDto user) {
+//
+//        UserDto existingUser = this.userService.getUserById(id);
+//        if (existingUser == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        UserDto updatedUser = this.userService.updateUser(id, user);
+//        updatedUser.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("users"));
+//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+//    }
 
-        UserDto existingUser = this.userService.getUserById(id);
-        if (existingUser == null) {
+
+    @PatchMapping("update-user-name/{id}/{newName}")
+    public ResponseEntity<UserDto> patchUserName(@PathVariable long id, @PathVariable String newName) {
+        try {
+            UserDto user = this.userService.patchUserName(id, newName);
+            return new ResponseEntity<UserDto>(user, HttpStatus.OK);
+        } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        UserDto updatedUser = this.userService.updateUser(id, user);
-        updatedUser.add(linkTo(methodOn(UserController.class).getUsers(Optional.of(1), Optional.of(10))).withRel("users"));
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
 
@@ -101,12 +124,16 @@ public class UserController {
     // http://localhost:8080/api/ex1/user/delete-user/1
     @DeleteMapping("delete-user/{id}")
     public ResponseEntity<UserDto> deleteUser(@PathVariable long id) {
-        UserDto deletedUser = userService.deleteUser(id);
+        try {
+            UserDto deletedUser = userService.deleteUser(id);
 
-        if (deletedUser == null) {
+            return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
+        } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (InvalidOperationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
     }
 }

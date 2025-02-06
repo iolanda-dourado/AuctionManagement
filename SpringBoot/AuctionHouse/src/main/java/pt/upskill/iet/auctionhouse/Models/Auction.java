@@ -26,7 +26,7 @@ public class Auction {
     private double finalPrice;
     private boolean active;
 
-    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Bid> bids = new ArrayList<>();
 

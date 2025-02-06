@@ -21,15 +21,17 @@ public class BidDto extends RepresentationModel<BidDto> {
     private long userId;
     private long itemId;
     private double price;
+    private LocalDate bidDate;
     private long auctionId;
 
     // Método que converte de Bid para DTO
     public static BidDto fromBidToDto(Bid bid) {
         return new BidDto(
-                bid.getId(),              // O primeiro argumento deve ser o ID do lance
+                bid.getId(),
                 bid.getUser().getId(),
                 bid.getItemId(),
                 bid.getPrice(),
+                bid.getBidDate(),
                 bid.getAuction().getId()
         );
     }

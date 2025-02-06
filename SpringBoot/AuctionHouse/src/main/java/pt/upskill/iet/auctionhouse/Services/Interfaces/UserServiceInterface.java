@@ -6,13 +6,15 @@ import org.springframework.data.domain.Page;
 
 public interface UserServiceInterface {
 
-    UserDto addUser(UserCreateDto userCreateDto);
+    UserDto addUser(UserCreateDto userCreateDto) throws Exception;
 
     Page<UserDto> getAllUsers(int page, int size);
 
-    UserDto getUserById(long id);
+    UserDto getUserById(long id) throws Exception;
 
-    UserDto updateUser (long id, UserDto userDto);
+//    UserDto updateUser (long id, UserDto userDto);
 
-    UserDto deleteUser (long id);
+    UserDto patchUserName(long id, String name) throws Exception;
+
+    UserDto deleteUser (long id) throws Exception ;
 }

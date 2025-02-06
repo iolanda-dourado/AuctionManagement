@@ -71,10 +71,15 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// </summary>
         /// <returns>A list of items as DTOs.</returns>
         public List<ItemDTO> GetItems() {
-            List<ItemDTO> itemsDTO = itemsValidator.ValidateItemsList();
+            itemsValidator.ValidateItemsList();
 
-            return itemsDTO;
+            List<Item> filteredItems = context.Items
+                .Include(i => i.Category)
+                .ToList();
+
+            return filteredItems.Select(ItemDTO.FromItemToDTO).ToList();
         }
+
 
 
         /// <summary>
@@ -85,8 +90,14 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         public ItemDTO GetItemById(int id) {
             Item item = itemsValidator.ValidateItemExistence(id);
 
+            item = context.Items
+                .Where(i => i.Id == id)
+                .Include(i => i.Category)
+                .FirstOrDefault()!;
+
             return ItemDTO.FromItemToDTO(item)!;
         }
+
 
 
         /// <summary>
@@ -154,7 +165,10 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// <param name="price">The maximum price of the items to retrieve.</param>
         /// <returns>A list of items with prices less than or equal to the specified price as DTOs.</returns>
         public List<ItemDTO> GetItemsUntilPrice(decimal price) {
-            List<Item> filteredItems = context.Items.Where(i => i.Price <= price).ToList();
+            List<Item> filteredItems = context.Items
+                .Where(i => i.Price <= price)
+                .Include(i => i.Category)
+                .ToList();
             itemsValidator.ValidateFilteredList(filteredItems);
 
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
@@ -201,7 +215,9 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// <returns>A list of sold items as DTOs.</returns>
         public List<ItemDTO> GetItemsSold() {
             List<Item> filteredItems = context.Items.
-                Where(i => i.Status == Enums.Status.Sold).ToList();
+                Where(i => i.Status == Enums.Status.Sold)
+                .Include(i => i.Category)
+                .ToList();
             itemsValidator.ValidateFilteredList(filteredItems);
 
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
@@ -216,7 +232,9 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// <returns>A list of unsold items as DTOs.</returns>
         public List<ItemDTO> GetItemsSoldByCategory(int categId) {
             List<Item> filteredItems = context.Items.
-                Where(i => i.Status == Enums.Status.Sold && i.CategoryId == categId).ToList();
+                Where(i => i.Status == Enums.Status.Sold && i.CategoryId == categId)
+                .Include(i => i.Category)
+                .ToList();
             itemsValidator.ValidateFilteredList(filteredItems);
 
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);
@@ -232,7 +250,9 @@ namespace AuctionManagement.WebAPI.Services.Implementation {
         /// <returns>A list of unsold items in the category as DTOs.</returns>
         public List<ItemDTO> GetItemsNotSoldByCategory(int categId) {
             List<Item> filteredItems = context.Items.
-                Where(i => i.Status == Enums.Status.Available && i.CategoryId == categId).ToList();
+                Where(i => i.Status == Enums.Status.Available && i.CategoryId == categId)
+                .Include(i => i.Category)
+                .ToList();
             itemsValidator.ValidateFilteredList(filteredItems);
 
             List<ItemDTO> filteredItemsDTO = filteredItems.ConvertAll(item => ItemDTO.FromItemToDTO(item)!);

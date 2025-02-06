@@ -81,29 +81,29 @@ namespace AuctionManagement.WebAPI.Data {
 
 
 
-            if (!auctionContext.Sales.Any()) {
-                var sales = new List<Sale>
-                {
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-5)), Price = 899.99m, ItemId = 1 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-10)), Price = 450.50m, ItemId = 2 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-15)), Price = 1299.00m, ItemId = 3 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-20)), Price = 120.00m, ItemId = 4 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-25)), Price = 199.99m, ItemId = 5 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-8)), Price = 1200.00m, ItemId = 8 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-12)), Price = 350.00m, ItemId = 9 },
-                    new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-18)), Price = 4500.00m, ItemId = 10 }
-                };
+            //if (!auctionContext.Sales.Any()) {
+            //    var sales = new List<Sale>
+            //    {
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-5)), Price = 899.99m, ItemId = 1 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-10)), Price = 450.50m, ItemId = 2 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-15)), Price = 1299.00m, ItemId = 3 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-20)), Price = 120.00m, ItemId = 4 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-25)), Price = 199.99m, ItemId = 5 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-8)), Price = 1200.00m, ItemId = 8 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-12)), Price = 350.00m, ItemId = 9 },
+            //        new Sale { Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-18)), Price = 4500.00m, ItemId = 10 }
+            //    };
 
-                var items = auctionContext.Items.ToList();
-                var item = new Item();
-                foreach (var sale in sales) {
-                    item = auctionContext.Items.Find(sale.ItemId);
-                    item.Status = Status.Sold;
-                }
+            //    var items = auctionContext.Items.ToList();
+            //    var item = new Item();
+            //    foreach (var sale in sales) {
+            //        item = auctionContext.Items.Find(sale.ItemId);
+            //        item.Status = Status.Sold;
+            //    }
 
-                auctionContext.Sales.AddRange(sales);
-                auctionContext.SaveChanges();
-            }
+            //    auctionContext.Sales.AddRange(sales);
+            //    auctionContext.SaveChanges();
+            //}
         }
 
 

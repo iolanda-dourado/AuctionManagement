@@ -1,18 +1,24 @@
 package pt.upskill.iet.auctionhouse.Services.Implementation;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.upskill.iet.auctionhouse.Dtos.*;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
 import pt.upskill.iet.auctionhouse.Models.Auction;
+import pt.upskill.iet.auctionhouse.Models.Bid;
 import pt.upskill.iet.auctionhouse.Repositories.AuctionRepository;
-import pt.upskill.iet.auctionhouse.Retrofit.AuctionHouseService;
+import pt.upskill.iet.auctionhouse.Retrofit.Service.AuctionHouseService;
 import pt.upskill.iet.auctionhouse.Services.Interfaces.AuctionServiceInterface;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -150,5 +156,33 @@ public class AuctionService implements AuctionServiceInterface {
         auction.setActive(isActive);
         auction = this.auctionRepository.save(auction);
         return AuctionDto.fromAuctionToDto(auction);
+    }
+
+
+    public List<Auction> checkDateAndTurnAuctionsIntoInactive()  throws Exception {
+        List<Auction> auctionsWithBids = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        // Confere se algum leilão está com a data final de hoje. Caso esteja, muda o estado para inativo e adiciona esse leilão à lista de leilões
+        for (Auction auction : this.auctionRepository.findAll()) {
+            if (!auction.isActive()) {
+                continue;
+            }
+            if (auction.getFinalDate().equals(today)) {
+                auction.setActive(false);
+                this.auctionRepository.save(auction);
+
+                // Confere se, dentre os leilões que estão fechados, há leilões que tenham lances. Caso haja, esse leilão é adicionado à lista de leilões
+                if (!auction.getBids().isEmpty()) {
+                    auctionsWithBids.add(auction);
+                    System.out.printf("CheckDate... -> Auction with id %d has bids and has been added to the list of auctions with bids\n", auction.getId());
+                } else {
+                    auctionHouseService.updateItemStatus(auction.getItemId(), StatusDto.Available);
+                    System.out.printf("CheckDate... -> Auction with id %d has no bids and its item with id %d is now available\n", auction.getId(), auction.getItemId());
+                }
+            }
+        }
+
+        return auctionsWithBids;
     }
 }
