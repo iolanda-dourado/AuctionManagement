@@ -18,7 +18,7 @@ public class InitService {
     @PostConstruct
     public void init() {
         try {
-            saleService.addSaleWithHighestBid(); // Agora a transação funciona corretamente! 🎯
+            saleService.addSaleWithHighestBid();
         } catch (Exception e) {
             System.err.println("Error adding sales in initialization: " + e.getMessage());
         }

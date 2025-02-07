@@ -1,15 +1,10 @@
 package pt.upskill.iet.auctionhouse.Retrofit.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
-import pt.upskill.iet.auctionhouse.Dtos.SaleDto;
-import pt.upskill.iet.auctionhouse.Dtos.StatusDto;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
-import pt.upskill.iet.auctionhouse.Retrofit.Service.AuctionHouseService;
-import retrofit2.Call;
-import retrofit2.http.POST;
+import pt.upskill.iet.auctionhouse.Retrofit.Service.AHItemService;
 
 import java.util.List;
 
@@ -18,40 +13,40 @@ import java.util.List;
 public class AuctionHouseApiController {
 
     @Autowired
-    AuctionHouseService auctionHouseService;
+    AHItemService AHItemService;
 
     @GetMapping("items")
     public List<ItemDto> getItems() {
-        return auctionHouseService.getItems();
+        return AHItemService.getItems();
     }
 
     @GetMapping("/available-items")
     public List<ItemDto> getAvailableItems() {
-        return auctionHouseService.getAvailableItems();
+        return AHItemService.getAvailableItems();
     }
 
     @GetMapping("/item-by-id/{id}")
     public ItemDto getItemById(@PathVariable long id) throws NotFoundException {
-        return auctionHouseService.getItemById(id);
+        return AHItemService.getItemById(id);
     }
 
-    @PatchMapping("/update-item-status/id/{id}/status/{status}")
-    public ResponseEntity<Void> updateItemStatus(
-            @PathVariable long id,
-            @PathVariable StatusDto status
-    ) {
-        try {
-            auctionHouseService.updateItemStatus(id, status);
-            return ResponseEntity.ok().build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+//    @PatchMapping("/update-item-status/id/{id}/status/{status}")
+//    public ResponseEntity<Void> updateItemStatus(
+//            @PathVariable long id,
+//            @PathVariable StatusDto status
+//    ) {
+//        try {
+//            auctionHouseService.updateItemStatus(id, status);
+//            return ResponseEntity.ok().build();
+//        } catch (NotFoundException e) {
+//            return ResponseEntity.notFound().build();
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
 
-    @PostMapping("/add-sale")
-    public SaleDto addSale(@RequestBody SaleDto saleDto) {
-        return auctionHouseService.addSale(saleDto.getPrice(), saleDto.getItemId());
-    }
+//    @PostMapping("/add-sale")
+//    public SaleDto addSale(@RequestBody SaleDto saleDto) {
+//        return auctionHouseService.addSale(saleDto.getPrice(), saleDto.getItemId());
+//    }
 }

@@ -31,26 +31,23 @@ public class AuctionController {
     private AuctionService auctionService;
 
 
-    // -------- ADD AUCTION --------
-    // http://localhost:8080/api/v1/auction/add-auction
+//     -------- ADD AUCTION --------
+//     http://localhost:8080/api/v1/auction/add-auction
     @PostMapping("add-auction")
     public ResponseEntity<AuctionDto> addAuction(@RequestBody AuctionCreateDto auctionCreateDto) {
         try {
-            // Chama o serviço para adicionar o leilão
             AuctionDto createdAuction = this.auctionService.addAuction(auctionCreateDto);
 
             // Adiciona links HATEOAS
             createdAuction.add(linkTo(methodOn(AuctionController.class).getAuctionById(createdAuction.getId())).withSelfRel());
             createdAuction.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(1), Optional.of(10))).withRel("Auctions"));
 
-            // Retorna a resposta com o status CREATED
             return new ResponseEntity<>(createdAuction, HttpStatus.CREATED);
         } catch (InvalidDateException | InvalidPriceException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // Retorna um erro genérico em caso de falha
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -64,7 +61,12 @@ public class AuctionController {
         int _page = page.orElse(0);
         int _size = size.orElse(10);
 
-        Page<AuctionDto> auctionsDto = this.auctionService.getAllAuctions(_page, _size);
+        Page<AuctionDto> auctionsDto = null;
+        try {
+            auctionsDto = this.auctionService.getAllAuctions(_page, _size);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         auctionsDto = auctionsDto.map((AuctionDto auction) -> auction.add(linkTo(methodOn(AuctionController.class).getAuctionById(auction.getId())).withSelfRel()));
         Link link = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(_page), Optional.of(_size))).withSelfRel();
 
@@ -102,20 +104,20 @@ public class AuctionController {
 
     // -------- UPDATE AUCTION --------
     // http://localhost:8080/api/ex1/auction/update-auction/1
-    @PutMapping("update-auction/{id}")
-    public ResponseEntity<AuctionDto> updateAuction(@RequestParam long id, @RequestBody AuctionUpdateDto auctionUpdateDtoDto) {
-        try {
-            AuctionDto updatedAuction = this.auctionService.updateAuction(id, auctionUpdateDtoDto);
-            updatedAuction.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(1), Optional.of(10))).withRel("auctions"));
-            return new ResponseEntity<>(updatedAuction, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (InvalidDateException | InvalidOperationException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PutMapping("update-auction/{id}")
+//    public ResponseEntity<AuctionDto> updateAuction(@RequestParam long id, @RequestBody AuctionUpdateDto auctionUpdateDtoDto) {
+//        try {
+//            AuctionDto updatedAuction = this.auctionService.updateAuction(id, auctionUpdateDtoDto);
+//            updatedAuction.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(1), Optional.of(10))).withRel("auctions"));
+//            return new ResponseEntity<>(updatedAuction, HttpStatus.OK);
+//        } catch (NotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (InvalidDateException | InvalidOperationException e) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
 
     // -------- DELETE AUCTION --------
@@ -135,15 +137,15 @@ public class AuctionController {
         }
     }
 
-    @PatchMapping("update-auction-status/{id}")
-    public ResponseEntity<AuctionDto> updateAuctionStatus(@PathVariable("id") long id, @RequestParam boolean isActive) {
-        try {
-            AuctionDto updatedAuction = this.auctionService.updateAuctionStatus(id, isActive);
-            return new ResponseEntity<>(updatedAuction, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PatchMapping("update-auction-status/{id}")
+//    public ResponseEntity<AuctionDto> updateAuctionStatus(@PathVariable("id") long id, @RequestParam boolean isActive) {
+//        try {
+//            AuctionDto updatedAuction = this.auctionService.updateAuctionStatus(id, isActive);
+//            return new ResponseEntity<>(updatedAuction, HttpStatus.OK);
+//        } catch (NotFoundException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }

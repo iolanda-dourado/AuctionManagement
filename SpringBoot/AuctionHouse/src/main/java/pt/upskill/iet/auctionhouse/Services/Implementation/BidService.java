@@ -16,7 +16,7 @@ import pt.upskill.iet.auctionhouse.Models.User;
 import pt.upskill.iet.auctionhouse.Repositories.AuctionRepository;
 import pt.upskill.iet.auctionhouse.Repositories.BidRepository;
 import pt.upskill.iet.auctionhouse.Repositories.UserRepository;
-import pt.upskill.iet.auctionhouse.Retrofit.Service.AuctionHouseService;
+import pt.upskill.iet.auctionhouse.Retrofit.Service.AHItemService;
 import pt.upskill.iet.auctionhouse.Services.Interfaces.BidServiceInterface;
 
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ public class BidService implements BidServiceInterface {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    AuctionHouseService auctionHouseService;
+    AHItemService AHItemService;
 
 
     // -------- ADD BID --------
@@ -47,7 +47,7 @@ public class BidService implements BidServiceInterface {
 
         // Buscar os detalhes do item associado ao leilão
         long itemId = auction.getItemId();
-        ItemDto itemDto = auctionHouseService.getItemById(itemId);
+        ItemDto itemDto = AHItemService.getItemById(itemId);
 
         // Verificar se o item existe do lado do .NET, se o leilão está ativo e se o valor da licitação é maior que o valor base do item
         if (itemDto == null) {

@@ -4,15 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pt.upskill.iet.auctionhouse.Dtos.ItemDto;
-import pt.upskill.iet.auctionhouse.Dtos.SaleDto;
 import pt.upskill.iet.auctionhouse.Dtos.StatusDto;
 import pt.upskill.iet.auctionhouse.Exceptions.NotFoundException;
-import pt.upskill.iet.auctionhouse.Retrofit.AuthInterceptor;
 import pt.upskill.iet.auctionhouse.Retrofit.Interfaces.AuctionHouseApiInterface;
 import pt.upskill.iet.auctionhouse.Retrofit.StatusDtoDeserializer;
 import pt.upskill.iet.auctionhouse.Retrofit.StatusDtoSerializer;
+import pt.upskill.iet.auctionhouse.Services.Implementation.SaleService;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -22,18 +23,20 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
 @Service
-public class AuctionHouseService {
+public class AHItemService {
 
     private static final String API_BASE_URL = "https://localhost:7053/api/";
     private AuctionHouseApiInterface auctionHouseApiInterface;
+    @Autowired
+    @Lazy
+    SaleService saleService;
 
-    public AuctionHouseService() {
+    public AHItemService() {
         // Cria um cliente OkHttp que ignora SSL e adiciona o token no cabeçalho
         OkHttpClient unsafeHttpClient = createUnsafeOkHttpClient("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBZG1pbiIsImp0aSI6ImZjZTViYzc5LTdjYzAtNDMxMS05ZDUwLTRkZDA2M2QwYTc0OSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzQ0MDM2OTIwLCJpc3MiOiJBSElzc3VlciJ9.hgmOjMo6fvmjOFQOzj6d-kLv4Q0hCiwjsgOFCafnGS4");
 
@@ -56,12 +59,13 @@ public class AuctionHouseService {
 
     public List<ItemDto> getItems() {
         try {
+            saleService.addSaleWithHighestBid();
             Response<List<ItemDto>> response = auctionHouseApiInterface.getItems().execute();
             if (response.isSuccessful()) {
                 return response.body();
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Error fetching items: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("AHItemService getItems - Error: " + e.getMessage());
         }
 
         return Collections.emptyList();
@@ -70,12 +74,15 @@ public class AuctionHouseService {
 
     public List<ItemDto> getAvailableItems() {
         try {
+            saleService.addSaleWithHighestBid();
             Response<List<ItemDto>> response = auctionHouseApiInterface.getAvailableItems().execute();
             if (response.isSuccessful()) {
                 return response.body();
             }
         } catch (IOException e) {
             throw new RuntimeException("Error fetching items: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("AHItemService getAvailableItems - Error: " + e.getMessage());
         }
 
         return Collections.emptyList();
@@ -118,28 +125,28 @@ public class AuctionHouseService {
     }
 
 
-    public SaleDto addSale(double price, long itemId) {
-        SaleDto saleDto = new SaleDto();
-        saleDto.setPrice(price);
-        saleDto.setItemId(itemId);
-
-        try {
-            Response<SaleDto> response = auctionHouseApiInterface.addSale(saleDto).execute();
-            if (response.isSuccessful()) {
-                return response.body();
-            } else {
-                // Logar o erro
-                System.err.println("Erro ao adicionar venda: " + response.code() + " - " + response.message());
-                if (response.errorBody() != null) {
-                    System.err.println("Detalhes do erro: " + response.errorBody().string());
-                }
-
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao criar venda: " + e.getMessage());
-        }
-        return null;
-    }
+//    public SaleDto addSale(double price, long itemId) {
+//        SaleDto saleDto = new SaleDto();
+//        saleDto.setPrice(price);
+//        saleDto.setItemId(itemId);
+//
+//        try {
+//            Response<SaleDto> response = auctionHouseApiInterface.addSale(saleDto).execute();
+//            if (response.isSuccessful()) {
+//                return response.body();
+//            } else {
+//                // Logar o erro
+//                System.err.println("Erro ao adicionar venda: " + response.code() + " - " + response.message());
+//                if (response.errorBody() != null) {
+//                    System.err.println("Detalhes do erro: " + response.errorBody().string());
+//                }
+//
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException("Erro ao criar venda: " + e.getMessage());
+//        }
+//        return null;
+//    }
 
 
     private OkHttpClient createUnsafeOkHttpClient(String token) {

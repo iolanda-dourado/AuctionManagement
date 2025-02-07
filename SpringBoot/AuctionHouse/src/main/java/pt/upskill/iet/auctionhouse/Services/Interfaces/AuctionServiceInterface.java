@@ -11,11 +11,11 @@ public interface AuctionServiceInterface {
 
     AuctionDto addAuction(AuctionCreateDto auctionDto) throws Exception;
 
-    Page<AuctionDto> getAllAuctions(int page, int size);
+    Page<AuctionDto> getAllAuctions(int page, int size) throws Exception;
 
     AuctionDto getAuctionById(long id) throws Exception;
 
-    AuctionDto updateAuction (long id, AuctionUpdateDto auctionUpdateDto) throws Exception;
+//    AuctionDto updateAuction (long id, AuctionUpdateDto auctionUpdateDto) throws Exception;
 
     AuctionDto deleteAuction (long id) throws Exception;
 }
