@@ -109,4 +109,17 @@ public class UserService implements UserServiceInterface {
         this.userRepository.deleteById(id);
         return UserDto.fromUserToDto(user);
     }
+
+
+    // Extra endpoints
+    @Override
+    public Page<UserDto> getUsersWithBids(int page, int size) {
+        return this.userRepository.findUsersWithBids(PageRequest.of(page, size)).map(UserDto::fromUserToDto);
+    }
+
+
+    @Override
+    public Page<UserDto> getUsersWithoutBids(int page, int size) {
+        return this.userRepository.findUsersWithoutBids(PageRequest.of(page, size)).map(UserDto::fromUserToDto);
+    }
 }

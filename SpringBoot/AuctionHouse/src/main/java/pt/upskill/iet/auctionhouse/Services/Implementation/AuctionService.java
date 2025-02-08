@@ -13,9 +13,6 @@ import pt.upskill.iet.auctionhouse.Repositories.AuctionRepository;
 import pt.upskill.iet.auctionhouse.Retrofit.Service.AHItemService;
 import pt.upskill.iet.auctionhouse.Services.Interfaces.AuctionServiceInterface;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -146,6 +143,38 @@ public class AuctionService implements AuctionServiceInterface {
     }
 
 
+
+    // ------- EXTRA ENDPOINT ---------
+
+
+    @Override
+    public Page<AuctionDto> getActiveAuctions(int page, int size) {
+        return this.auctionRepository.findActiveAuctions(PageRequest.of(page, size)).map(AuctionDto::fromAuctionToDto);
+    }
+
+    @Override
+    public Page<AuctionDto> getInactiveAuctions(int page, int size) {
+        return this.auctionRepository.findInactiveAuctions(PageRequest.of(page, size)).map(AuctionDto::fromAuctionToDto);
+    }
+
+    @Override
+    public Page<AuctionDto> getAuctionsWithBids(int page, int size) {
+        return this.auctionRepository.findAuctionsWithBids(PageRequest.of(page, size)).map(AuctionDto::fromAuctionToDto);
+    }
+
+    @Override
+    public Page<AuctionDto> getAuctionsWithoutBids(int page, int size) {
+        return this.auctionRepository.findAuctionsWithoutBids(PageRequest.of(page, size)).map(AuctionDto::fromAuctionToDto);
+    }
+
+    @Override
+    public Page<AuctionDto> getAuctionsAbovePrice(double price, int page, int size) {
+        return this.auctionRepository.findAuctionsAbovePrice(price, PageRequest.of(page, size)).map(AuctionDto::fromAuctionToDto);
+    }
+
+
+
+
     public AuctionDto updateAuctionStatus(long id, boolean isActive) throws Exception {
         Optional<Auction> optionalAuction = this.auctionRepository.findById(id);
         if (optionalAuction.isEmpty()) {
@@ -157,4 +186,5 @@ public class AuctionService implements AuctionServiceInterface {
         auction = this.auctionRepository.save(auction);
         return AuctionDto.fromAuctionToDto(auction);
     }
+
 }

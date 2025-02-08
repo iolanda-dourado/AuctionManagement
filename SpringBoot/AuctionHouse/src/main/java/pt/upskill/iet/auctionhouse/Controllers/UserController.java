@@ -7,6 +7,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
 import pt.upskill.iet.auctionhouse.Dtos.UserCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.UserDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidNifException;
@@ -55,21 +56,8 @@ public class UserController {
         int _page = page.orElse(0);
         int _size = size.orElse(10);
 
-        Page<UserDto> userDtos = this.userService.getAllUsers(_page, _size);
-        userDtos = userDtos.map((UserDto user) -> user.add(linkTo(methodOn(UserController.class).getUserById(user.getId())).withSelfRel()));
-        Link link = linkTo(methodOn(UserController.class).getUsers(Optional.of(_page), Optional.of(_size))).withSelfRel();
-
-        List<Link> links = new ArrayList<>();
-        links.add(link);
-        if (!userDtos.isLast()) {
-            Link _link = linkTo(methodOn(UserController.class).getUsers(Optional.of(_page + 1), size)).withRel("next");
-            links.add(_link);
-        }
-        if (!userDtos.isFirst()) {
-            Link _link = linkTo(methodOn(UserController.class).getUsers(Optional.of(_page - 1), size)).withRel("previous");
-            links.add(_link);
-        }
-        return CollectionModel.of(userDtos, links);
+        Page<UserDto> usersDto = this.userService.getAllUsers(_page, _size);
+        return createPagedResponse(usersDto, _page, _size);
     }
 
 
@@ -135,5 +123,53 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+
+    // ----------- EXTRA ENDPOINTS -----------
+
+    // -------- GET USERS WITH BIDS --------
+    // http://localhost:8080/api/v1/user/get-users-with-bids
+    @GetMapping("get-users-with-bids")
+    public CollectionModel<UserDto> getUsersWithBids(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<UserDto> usersDto = this.userService.getUsersWithBids(_page, _size);
+
+        return createPagedResponse(usersDto, _page, _size);
+    }
+
+
+    // -------- GET USERS WITHOUT BIDS --------
+    // http://localhost:8080/api/v1/user/get-users-without-bids
+    @GetMapping("get-users-without-bids")
+    public CollectionModel<UserDto> getUsersWithoutBids(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<UserDto> usersDto = this.userService.getUsersWithoutBids(_page, _size);
+
+        return createPagedResponse(usersDto, _page, _size);
+    }
+
+
+
+    private CollectionModel<UserDto> createPagedResponse(Page<UserDto> usersDto, int page, int size) {
+        usersDto = usersDto.map(auction -> auction.add(linkTo(methodOn(AuctionController.class).getAuctionById(auction.getId())).withSelfRel()));
+
+        Link selfLink = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page), Optional.of(size))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(selfLink);
+
+        if (!usersDto.isLast()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page + 1), Optional.of(size))).withRel("next"));
+        }
+        if (!usersDto.isFirst()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page - 1), Optional.of(size))).withRel("previous"));
+        }
+
+        return CollectionModel.of(usersDto, links);
     }
 }

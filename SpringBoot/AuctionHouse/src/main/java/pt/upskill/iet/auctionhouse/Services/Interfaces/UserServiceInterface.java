@@ -17,4 +17,9 @@ public interface UserServiceInterface {
     UserDto patchUserName(long id, String name) throws Exception;
 
     UserDto deleteUser (long id) throws Exception ;
+
+    // Extra endpoints
+    Page<UserDto> getUsersWithBids(int page, int size);
+
+    Page<UserDto> getUsersWithoutBids(int page, int size);
 }

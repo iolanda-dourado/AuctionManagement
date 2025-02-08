@@ -19,14 +19,14 @@ import java.util.List;
 @Service
 public class SaleService {
 
-    private final AHItemService AHItemService;
-    private final AHSaleService AHSaleService;
+    private final AHItemService auctionHouseItemService;
+    private final AHSaleService auctionHouseSaleService;
     private final AuctionRepository auctionRepository;
 
     @Autowired
-    public SaleService(AHItemService AHItemService, AHSaleService AHSaleService, AuctionRepository auctionRepository) {
-        this.AHItemService = AHItemService;
-        this.AHSaleService = AHSaleService;
+    public SaleService(AHItemService auctionHouseItemService, AHSaleService auctionHouseSaleService, AuctionRepository auctionRepository) {
+        this.auctionHouseItemService = auctionHouseItemService;
+        this.auctionHouseSaleService = auctionHouseSaleService;
         this.auctionRepository = auctionRepository;
     }
 
@@ -49,7 +49,7 @@ public class SaleService {
                     auctionsWithBids.add(auction);
                     System.out.printf("CheckDate... -> Auction with id %d has bids and has been added to the list of auctions with bids\n", auction.getId());
                 } else {
-                    AHItemService.updateItemStatus(auction.getItemId(), StatusDto.Available);
+                    auctionHouseItemService.updateItemStatus(auction.getItemId(), StatusDto.Available);
                     System.out.printf("CheckDate... -> Auction with id %d has no bids and its item with id %d is now available\n", auction.getId(), auction.getItemId());
                 }
             }
@@ -77,7 +77,7 @@ public class SaleService {
             return null;
         }
 
-        ItemDto itemDto = AHItemService.getItemById(bidWithGreaterPrice.getItemId());
+        ItemDto itemDto = auctionHouseItemService.getItemById(bidWithGreaterPrice.getItemId());
         if (itemDto.getStatus() == StatusDto.Sold) {
             throw new InvalidOperationException("getBidWithGreaterPrice -> The item is already sold, therefore the sale cannot continue.");
         }
@@ -99,7 +99,7 @@ public class SaleService {
         System.out.println("addSalesWithHighestBid -> Processing sale for auction ID: " + auction.getId());
 
         // Tenta adicionar a venda
-        this.AHSaleService.addSale(bidWithGreaterPrice.getPrice(), auction.getItemId());
+        this.auctionHouseSaleService.addSale(bidWithGreaterPrice.getPrice(), auction.getItemId());
         System.out.println("addSalesWithHighestBid -> Sale added successfully!");
 
         // Atualiza preço final no leilão

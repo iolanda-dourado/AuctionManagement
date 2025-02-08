@@ -1,5 +1,6 @@
 package pt.upskill.iet.auctionhouse.Dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class AuctionDto extends RepresentationModel<AuctionDto> {
 
     private boolean active;
 
+    @JsonIgnore
     private List<Bid> bids;
 
     // Método que converte de User para DTO

@@ -20,6 +20,8 @@ public class UserDto extends RepresentationModel<UserDto> {
     private long id;
     private String name;
     private String nif;
+
+    @JsonIgnore
     private List<Bid> bids;
 
     // Método que converte de User para DTO

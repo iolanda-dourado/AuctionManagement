@@ -144,4 +144,19 @@ public class BidService implements BidServiceInterface {
         this.bidRepository.deleteById(id);
         return BidDto.fromBidToDto(optionalBid.get());
     }
+
+
+
+    // -------- EXTRA ENDPOINTS --------
+
+    @Override
+    public Page<BidDto> getBidsByUserId(long userId, int page, int size) {
+        return this.bidRepository.findBidsByUserId(userId, PageRequest.of(page, size)).map(BidDto::fromBidToDto);
+    }
+
+
+    @Override
+    public Page<BidDto> getBidsByAuctionId(long auctionId, int page, int size) {
+        return this.bidRepository.findBidsByAuctionId(auctionId, PageRequest.of(page, size)).map(BidDto::fromBidToDto);
+    }
 }

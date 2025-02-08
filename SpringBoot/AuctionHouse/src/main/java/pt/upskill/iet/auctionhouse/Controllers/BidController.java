@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.BidCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.BidDto;
+import pt.upskill.iet.auctionhouse.Dtos.UserDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
@@ -56,20 +57,8 @@ public class BidController {
         int _size = size.orElse(10);
 
         Page<BidDto> bidsDto = this.bidService.getAllBids(_page, _size);
-        bidsDto = bidsDto.map(bid -> bid.add(linkTo(methodOn(BidController.class).getBidById(bid.getId())).withSelfRel()));
-        Link link = linkTo(methodOn(BidController.class).getBids(Optional.of(_page), Optional.of(_size))).withSelfRel();
 
-        List<Link> links = new ArrayList<>();
-        links.add(link);
-        if (!bidsDto.isLast()) {
-            Link _link = linkTo(methodOn(BidController.class).getBids(Optional.of(_page + 1), size)).withRel("next");
-            links.add(_link);
-        }
-        if (!bidsDto.isFirst()) {
-            Link _link = linkTo(methodOn(BidController.class).getBids(Optional.of(_page - 1), size)).withRel("previous");
-            links.add(_link);
-        }
-        return CollectionModel.of(bidsDto, links);
+        return createPagedResponse(bidsDto, _page, _size);
     }
 
 
@@ -122,4 +111,52 @@ public class BidController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+
+    // -------- EXTRA ENDPOINTS --------
+
+    // http://localhost:8080/api/v1/bid/get-bids-by-user/1
+    @GetMapping("get-bids-by-user/{id}")
+    public CollectionModel<BidDto> getBidsByUser(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @PathVariable("id") long id) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<BidDto> bidsDto = this.bidService.getBidsByUserId(id, _page, _size);
+
+        return createPagedResponse(bidsDto, _page, _size);
+    }
+
+
+
+    // http://localhost:8080/api/v1/bid/get-bids-by-auction/1
+    @GetMapping("get-bids-by-auction/{id}")
+    public CollectionModel<BidDto> getBidsByAuction(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @PathVariable("id") long id) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<BidDto> bidsDto = this.bidService.getBidsByAuctionId(id, _page, _size);
+
+        return createPagedResponse(bidsDto, _page, _size);
+    }
+
+
+    private CollectionModel<BidDto> createPagedResponse(Page<BidDto> bidsDto, int page, int size) {
+        bidsDto = bidsDto.map(auction -> auction.add(linkTo(methodOn(AuctionController.class).getAuctionById(auction.getId())).withSelfRel()));
+
+        Link selfLink = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page), Optional.of(size))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(selfLink);
+
+        if (!bidsDto.isLast()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page + 1), Optional.of(size))).withRel("next"));
+        }
+        if (!bidsDto.isFirst()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page - 1), Optional.of(size))).withRel("previous"));
+        }
+
+        return CollectionModel.of(bidsDto, links);
+    }
+
 }

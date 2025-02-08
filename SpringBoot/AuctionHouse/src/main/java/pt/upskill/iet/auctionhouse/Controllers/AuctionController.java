@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionCreateDto;
 import pt.upskill.iet.auctionhouse.Dtos.AuctionDto;
-import pt.upskill.iet.auctionhouse.Dtos.AuctionUpdateDto;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidDateException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidOperationException;
 import pt.upskill.iet.auctionhouse.Exceptions.InvalidPriceException;
@@ -31,7 +30,7 @@ public class AuctionController {
     private AuctionService auctionService;
 
 
-//     -------- ADD AUCTION --------
+    //     -------- ADD AUCTION --------
 //     http://localhost:8080/api/v1/auction/add-auction
     @PostMapping("add-auction")
     public ResponseEntity<AuctionDto> addAuction(@RequestBody AuctionCreateDto auctionCreateDto) {
@@ -53,7 +52,6 @@ public class AuctionController {
     }
 
 
-
     // -------- GET AUCTIONS --------
     // http://localhost:8080/api/v1/auction/get-auctions
     @GetMapping("get-auctions")
@@ -67,20 +65,8 @@ public class AuctionController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        auctionsDto = auctionsDto.map((AuctionDto auction) -> auction.add(linkTo(methodOn(AuctionController.class).getAuctionById(auction.getId())).withSelfRel()));
-        Link link = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(_page), Optional.of(_size))).withSelfRel();
 
-        List<Link> links = new ArrayList<>();
-        links.add(link);
-        if (!auctionsDto.isLast()) {
-            Link _link = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(_page + 1), size)).withRel("next");
-            links.add(_link);
-        }
-        if (!auctionsDto.isFirst()) {
-            Link _link = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(_page - 1), size)).withRel("previous");
-            links.add(_link);
-        }
-        return CollectionModel.of(auctionsDto, links);
+        return createPagedResponse(auctionsDto, _page, _size);
     }
 
 
@@ -132,10 +118,97 @@ public class AuctionController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (InvalidOperationException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    // -------- EXTRA ENDPOINTS --------
+
+    // http://localhost:8080/api/v1/auction/get-active-auctions
+    @GetMapping("get-active-auctions")
+    public CollectionModel<AuctionDto> getActiveAuctions(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<AuctionDto> auctionsDto = null;
+        auctionsDto = this.auctionService.getActiveAuctions(_page, _size);
+
+        return createPagedResponse(auctionsDto, _page, _size);
+    }
+
+
+    // http://localhost:8080/api/v1/auction/get-inactive-auctions
+    @GetMapping("get-inactive-auctions")
+    public CollectionModel<AuctionDto> getInactiveAuctions(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<AuctionDto> auctionsDto = null;
+        auctionsDto = this.auctionService.getInactiveAuctions(_page, _size);
+
+        return createPagedResponse(auctionsDto, _page, _size);
+    }
+
+
+    // http://localhost:8080/api/v1/auction/get-auctions-with-bids
+    @GetMapping("get-auctions-with-bids")
+    public CollectionModel<AuctionDto> getAuctionsWithBids(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<AuctionDto> auctionsDto = null;
+        auctionsDto = this.auctionService.getAuctionsWithBids(_page, _size);
+
+        return createPagedResponse(auctionsDto, _page, _size);
+    }
+
+
+    // http://localhost:8080/api/v1/auction/get-auctions-without-bids
+    @GetMapping("get-auctions-without-bids")
+    public CollectionModel<AuctionDto> getAuctionsWithoutBids(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<AuctionDto> auctionsDto = null;
+        auctionsDto = this.auctionService.getAuctionsWithoutBids(_page, _size);
+
+        return createPagedResponse(auctionsDto, _page, _size);
+    }
+
+
+
+    // http://localhost:8080/api/v1/auction/get-auctions-above-price/1000
+    @GetMapping("get-auctions-above-price/{price}")
+    public CollectionModel<AuctionDto> getAuctionsAbovePrice(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @PathVariable("price") double price) {
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+
+        Page<AuctionDto> auctionsDto = null;
+        auctionsDto = this.auctionService.getAuctionsAbovePrice(price, _page, _size);
+
+        return createPagedResponse(auctionsDto, _page, _size);
+    }
+
+
+    private CollectionModel<AuctionDto> createPagedResponse(Page<AuctionDto> auctionsDto, int page, int size) {
+        auctionsDto = auctionsDto.map(auction -> auction.add(linkTo(methodOn(AuctionController.class).getAuctionById(auction.getId())).withSelfRel()));
+
+        Link selfLink = linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page), Optional.of(size))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(selfLink);
+
+        if (!auctionsDto.isLast()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page + 1), Optional.of(size))).withRel("next"));
+        }
+        if (!auctionsDto.isFirst()) {
+            links.add(linkTo(methodOn(AuctionController.class).getAuctions(Optional.of(page - 1), Optional.of(size))).withRel("previous"));
+        }
+
+        return CollectionModel.of(auctionsDto, links);
+    }
+
 
 //    @PatchMapping("update-auction-status/{id}")
 //    public ResponseEntity<AuctionDto> updateAuctionStatus(@PathVariable("id") long id, @RequestParam boolean isActive) {

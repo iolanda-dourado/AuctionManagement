@@ -15,4 +15,10 @@ public interface BidServiceInterface {
 //    BidDto updateBid (long id, BidDto BidDto) throws Exception;
 
     BidDto deleteBid (long id) throws Exception;
+
+
+    // Extra endpoints
+    Page<BidDto> getBidsByUserId(long userId, int page, int size);
+
+    Page<BidDto> getBidsByAuctionId(long auctionId, int page, int size);
 }
